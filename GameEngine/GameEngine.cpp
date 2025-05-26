@@ -10,6 +10,7 @@
 #include <cmath>
 #include "Shader.h"
 #include "Camera.h"
+#include "LObject.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -45,6 +46,34 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "\n"
 "in vec3 Color;"
 "in vec2 TexCoords;"
+"\n"
+"void main()\n"
+"{\n"
+"   FragColor = texture(texture1, TexCoords);"
+"}\0";
+
+const char* simpleVertexShaderSource = "#version 330 core\n" //Create shader source C-style string
+"layout (location = 0) in vec2 aPos;\n"
+"layout (location = 1) in vec2 aTexCoords;\n"
+"\n"
+"uniform mat4 model;\n"
+"uniform mat4 projection;\n"
+"\n"
+"out vec2 TexCoords;"
+"\n"
+"void main()\n"
+"{\n"
+"   gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);\n"
+"   TexCoords = aTexCoords;"
+"}\0";
+
+//Create fragment shader
+const char* simpleFragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;"
+"\n"
+"in vec2 TexCoords;"
+"\n"
+"uniform sampler2D texture1;"
 "\n"
 "void main()\n"
 "{\n"
@@ -152,6 +181,8 @@ int main(void)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+    LObject* myObject = new LObject("../Content/bee.png");
+
     //Create VBO and VBA
     float vertexData[]
     {
@@ -192,7 +223,7 @@ int main(void)
 
     Camera myCamera;
 
-    Shader myShader(vertexShaderSource, fragmentShaderSource);
+    Shader myShader(simpleVertexShaderSource, simpleFragmentShaderSource);
     myShader.UseShader();
     
     myShader.SetMatrix4Uniform("model", glm::value_ptr(glm::mat4(1.0f)));
@@ -218,33 +249,13 @@ int main(void)
         //Input
         ProcessInput(window);
 
-        //double mouseX, mouseY;
-        //glfwGetCursorPos(window, &mouseX, &mouseY);
-        //std::cout << "MousePos -> X: " << mouseX << " | Y: " << mouseY << std::endl;
-
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) 
-        {
-            position.x += speed * deltaTime;
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
-            modelMatrix = glm::translate(modelMatrix, position);
-            myShader.SetMatrix4Uniform("model", glm::value_ptr(modelMatrix));
-            std::cout << "Position -> X: " << position.x << " | Y: " << position.y << " | Z: " << position.z << std::endl;
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        {
-            position.x -= speed * deltaTime;
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
-            modelMatrix = glm::translate(modelMatrix, position);
-            myShader.SetMatrix4Uniform("model", glm::value_ptr(modelMatrix));
-        }
-
         //Rendering
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        myObject->Update();
+        //glBindVertexArray(VAO);
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);

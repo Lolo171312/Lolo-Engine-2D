@@ -11,10 +11,16 @@ public:
 	virtual void Update();
 
 private:
+	void LoadTexture(const char* texDir, int* width, int* height);
+	void GenerateMesh(const int* width, const int* height);
+
 	/*Transform Variables*/
 	glm::vec3 _location;
 
 	/*Texture Variables*/
 	unsigned int _textureId;
 	unsigned char* _textureData;
+
+	/*Mesh Variables*/
+	unsigned int _VAO;
 };
