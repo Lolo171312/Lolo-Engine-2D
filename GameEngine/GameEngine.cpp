@@ -44,7 +44,6 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "\n"
 "uniform sampler2D texture1;"
 "\n"
-"in vec3 Color;"
 "in vec2 TexCoords;"
 "\n"
 "void main()\n"
@@ -95,51 +94,6 @@ void ProcessInput(GLFWwindow* window)
     }
 }
 
-unsigned int LoadTexture(const char* textureLocation) 
-{
-    unsigned int textureId;
-    //stbi_set_flip_vertically_on_load(true);
-    glGenTextures(1, &textureId);
-    int textureX, textureY, nrComponents;
-    stbi_uc* texData = stbi_load(textureLocation, &textureX, &textureY, &nrComponents, 0);
-    if (texData)
-    {
-        GLenum format = GL_RED;
-        if (nrComponents == 1)
-        {
-            format = GL_RED;
-        }
-        else if (nrComponents == 3)
-        {
-            format = GL_RGB;
-        }
-        else if (nrComponents == 4)
-        {
-            format = GL_RGBA;
-        }
-
-        glBindTexture(GL_TEXTURE_2D, textureId);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, textureX, textureY, 0, format, GL_UNSIGNED_BYTE, texData);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        stbi_image_free(texData);
-    }
-    else
-    {
-        std::cout << "Texture failed to load" << std::endl;
-        stbi_image_free(texData);
-    }
-
-    return textureId;
-}
-
 int main(void)
 {
     //Initialize GLFW
@@ -181,48 +135,6 @@ int main(void)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-    LObject* myObject = new LObject("../Content/bee.png");
-
-    //Create VBO and VBA
-    float vertexData[]
-    {
-        80.0f, 92.0f, -5.0f, 1.0f, 1.0f,
-        80.0f, 0.0f, -5.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, -5.0f, 0.0f, 0.0f,
-        0.0f, 92.0f, -5.0f, 0.0f, 1.0f
-    };
-
-    unsigned int indexData[]
-    {
-        0, 1, 2,
-        3, 0, 2
-    };
-
-    GLuint VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), &vertexData, GL_STATIC_DRAW);
-
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), &indexData, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);
-
-    unsigned int texture = LoadTexture("../Content/bee.png");
-    glActiveTexture(0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    Camera myCamera;
-
     Shader myShader(simpleVertexShaderSource, simpleFragmentShaderSource);
     myShader.UseShader();
     
@@ -231,13 +143,10 @@ int main(void)
     float verticalCoord = (float)WINDOW_HEIGHT;
     glm::mat4 projection = glm::ortho(0.0f, horizontalCoord, verticalCoord, 0.0f, 0.1f, 100.0f);
     myShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
-    myShader.SetVec3Uniform("color", glm::vec3(0.0f, 0.2f, 1.0f));
     myShader.SetIntUniform("texture1", 0);
 
-    glEnable(GL_DEPTH_TEST);
-
-    float speed = 120.0f;
-    glm::vec3 position(0.0f);
+    LObject* myObject = new LObject("../Content/bee.png", &myShader);
+    LObject* myOtherObject = new LObject("../Content/container2.png", &myShader);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -248,14 +157,15 @@ int main(void)
 
         //Input
         ProcessInput(window);
+        myObject->SetObjectWorldLocation(glm::vec2(470.0f, 300.0f));
 
         //Rendering
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        myOtherObject->Update();
+        
         myObject->Update();
-        //glBindVertexArray(VAO);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
