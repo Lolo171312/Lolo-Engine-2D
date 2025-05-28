@@ -137,8 +137,6 @@ int main(void)
 
     Shader myShader(simpleVertexShaderSource, simpleFragmentShaderSource);
     myShader.UseShader();
-    
-    myShader.SetMatrix4Uniform("model", glm::value_ptr(glm::mat4(1.0f)));
     float horizontalCoord = (float)WINDOW_WIDTH;
     float verticalCoord = (float)WINDOW_HEIGHT;
     glm::mat4 projection = glm::ortho(0.0f, horizontalCoord, verticalCoord, 0.0f, 0.1f, 100.0f);
@@ -157,14 +155,13 @@ int main(void)
 
         //Input
         ProcessInput(window);
-        myObject->SetObjectWorldLocation(glm::vec2(470.0f, 300.0f));
+        myObject->SetObjectLocation(glm::vec2(470.0f, 300.0f));
 
         //Rendering
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         myOtherObject->Update();
-        
         myObject->Update();
 
         //Check and call events and swap buffers

@@ -7,7 +7,7 @@
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/type_ptr.hpp"
 
-LObject::LObject(const char* textureFileDir, Shader* shaderPtr, const glm::vec2& initialLocation) : _location(initialLocation), _objectShader(shaderPtr)
+LObject::LObject(const char* textureFileDir, Shader* shaderPtr, const Transform& initialTransform) : _transform(initialTransform), _objectShader(shaderPtr)
 {
 	//Get texture data
 	int textureWidth, textureHeight;
@@ -47,26 +47,29 @@ void LObject::LoadTexture(const char* texDir, int* width, int* height)
 	//Generate Texture
 	glGenTextures(1, &_textureId);
 
-	int nrComponents;
-	_textureData = stbi_load(texDir, width, height, &nrComponents, 0);
-	if (_textureData)
+	unsigned int format = 0;
+	int nrComponents = 0;
+	//Load image
+	unsigned char* textureData = stbi_load(texDir, width, height, &nrComponents, 0);
+	if (textureData)
 	{
+		//Check it´s format
 		if (nrComponents == 1) 
 		{
-			_format = GL_RED;
+			format = GL_RED;
 		}
 		if (nrComponents == 3) 
 		{
-			_format = GL_RGB;
+			format = GL_RGB;
 		}
 		else if (nrComponents == 4) 
 		{
-			_format = GL_RGBA;
+			format = GL_RGBA;
 		}
 
 		//If data is valid, then bind texture and set its data
 		glBindTexture(GL_TEXTURE_2D, _textureId);
-		glTexImage2D(GL_TEXTURE_2D, 0, _format, *width, *height, 0, _format, GL_UNSIGNED_BYTE, _textureData);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, *width, *height, 0, format, GL_UNSIGNED_BYTE, textureData);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -83,25 +86,28 @@ void LObject::LoadTexture(const char* texDir, int* width, int* height)
 	}
 
 	//Once the data has been set, free the loaded image
-	stbi_image_free(_textureData);
+	stbi_image_free(textureData);
 }
 
 void LObject::GenerateMesh(const int* width, const int* height)
 {
+	//Generate vertex positions (pixel size) according to the texture
 	float vertexData[16]
 	{
-		0.0f, (float)*height, 0.0f, 1.0f,
-		(float)*width, (float)*height, 1.0f, 1.0f,
-		(float)*width, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f
+		-(float)*width/2.0f, (float)*height / 2.0f, 0.0f, 1.0f,
+		(float)*width / 2.0f, (float)*height / 2.0f, 1.0f, 1.0f,
+		(float)*width / 2.0f, -(float)*height / 2.0f, 1.0f, 0.0f,
+		-(float)*width / 2.0f, -(float)*height / 2.0f, 0.0f, 0.0f
 	};
 
+	//Generate indices to create EBO later
 	unsigned int vertices[6]
 	{
 		0, 1, 2,
 		3, 0, 2
 	};
 
+	//Create and set data for VAO, VBO and EBO
 	unsigned int VBO, EBO;
 	glGenVertexArrays(1, &_VAO);
 	glBindVertexArray(_VAO);
@@ -119,6 +125,7 @@ void LObject::GenerateMesh(const int* width, const int* height)
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*) (sizeof(float) * 2));
 	glEnableVertexAttribArray(1);
 
+	//Unbind buffers
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -127,6 +134,10 @@ void LObject::GenerateMesh(const int* width, const int* height)
 void LObject::SetShaderModelMatrix()
 {
 	glm::mat4 modelMatrix = glm::mat4(1.0f);
-	modelMatrix = glm::translate(modelMatrix, glm::vec3(_location, 0.0f));
-	_objectShader->SetMatrix4Uniform("model", glm::value_ptr(modelMatrix));
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(_transform._location, 0.0f)); //Translate
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(_transform._angle), glm::vec3(0.0f, 0.0f, 1.0f)); //Rotation (Only front axis)
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(_transform._scale, 1.0f)); //Scale
+
+	//Set model matrix in the Shader
+	_objectShader->SetMatrix4Uniform("model", glm::value_ptr(modelMatrix)); 
 }
