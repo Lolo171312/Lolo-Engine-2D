@@ -1,8 +1,10 @@
 #pragma once
 
 #include "glm/glm/glm.hpp"
+#include <vector>
 
 class Shader;
+class LComponent;
 
 struct Transform 
 {
@@ -30,10 +32,13 @@ public:
 	/*
 	* Constructor and Destructor
 	*/
-	LObject(const char* textureFileDir, Shader* shaderPtr, const Transform& initialTransform = Transform());
+	LObject(Shader* shaderPtr, const Transform& initialTransform = Transform());
 	~LObject();
 
-	virtual void Update();
+	void AttachComponent(LComponent* newComponent);
+	void UpdateComponents(float deltaTime);
+
+	virtual void Update(float deltaTime);
 
 	/*
 	* Transform Functions
@@ -66,4 +71,7 @@ private:
 
 	/*Shader Variables*/
 	Shader* _objectShader = nullptr;
+
+	/*Vector of components owned by the object*/
+	std::vector<LComponent*> _components;
 };

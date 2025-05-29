@@ -6,13 +6,14 @@
 #include <iostream>
 #include "glm/glm/gtc/matrix_transform.hpp"
 #include "glm/glm/gtc/type_ptr.hpp"
+#include "LComponent.h"
 
-LObject::LObject(const char* textureFileDir, Shader* shaderPtr, const Transform& initialTransform) : _transform(initialTransform), _objectShader(shaderPtr)
+LObject::LObject(Shader* shaderPtr, const Transform& initialTransform) : _transform(initialTransform), _objectShader(shaderPtr)
 {
 	//Get texture data
-	int textureWidth, textureHeight;
-	LoadTexture(textureFileDir, &textureWidth, &textureHeight);
-	GenerateMesh(&textureWidth, &textureHeight);
+	//int textureWidth, textureHeight;
+	//LoadTexture(textureFileDir, &textureWidth, &textureHeight);
+	//GenerateMesh(&textureWidth, &textureHeight);
 }
 
 LObject::~LObject()
@@ -21,7 +22,29 @@ LObject::~LObject()
 	glDeleteTextures(1, &_textureId);
 }
 
-void LObject::Update()
+void LObject::AttachComponent(LComponent* newComponent)
+{
+	if (newComponent) 
+	{
+		newComponent->AttachComponent(this);
+		_components.push_back(newComponent);
+	}
+}
+
+void LObject::UpdateComponents(float deltaTime)
+{
+	if (_components.size() == 0) return;
+
+	for (std::vector<LComponent*>::const_iterator itr = _components.begin(); itr != _components.end(); ++itr)
+	{
+		if ((*itr)->GetIsActive()) 
+		{
+			(*itr)->Update(deltaTime);
+		}
+	}
+}
+
+void LObject::Update(float deltaTime)
 {
 	//Enable shader if there is one
 	if (_objectShader != nullptr)
@@ -30,16 +53,18 @@ void LObject::Update()
 		SetShaderModelMatrix();
 	}
 
-	//Enable blend and object´s texture
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _textureId);
+	UpdateComponents(deltaTime);
 
-	//Draw mesh
-	glBindVertexArray(_VAO);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	////Enable blend and object´s texture
+	//glEnable(GL_BLEND);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, _textureId);
+	//
+	////Draw mesh
+	//glBindVertexArray(_VAO);
+	//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	//glBindVertexArray(0);
 }
 
 void LObject::LoadTexture(const char* texDir, int* width, int* height)

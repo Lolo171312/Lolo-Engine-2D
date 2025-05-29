@@ -131,13 +131,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CTextureRenderer.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="LComponent.cpp" />
     <ClCompile Include="LObject.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CTextureRenderer.h" />
+    <ClInclude Include="LComponent.h" />
     <ClInclude Include="LObject.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>

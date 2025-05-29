@@ -11,6 +11,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "LObject.h"
+#include "CTextureRenderer.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -143,8 +144,13 @@ int main(void)
     myShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
     myShader.SetIntUniform("texture1", 0);
 
-    LObject* myObject = new LObject("../Content/bee.png", &myShader);
-    LObject* myOtherObject = new LObject("../Content/container2.png", &myShader);
+    LObject* myObject = new LObject(&myShader);
+    CTextureRenderer* TextureRenderer = new CTextureRenderer("../Content/bee.png");
+    myObject->AttachComponent(TextureRenderer);
+
+    LObject* myOtherObject = new LObject(&myShader);
+    CTextureRenderer* OtherTextureRenderer = new CTextureRenderer("../Content/container2.png");
+    myOtherObject->AttachComponent(OtherTextureRenderer);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -161,8 +167,8 @@ int main(void)
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        myOtherObject->Update();
-        myObject->Update();
+        myOtherObject->Update(deltaTime);
+        myObject->Update(deltaTime);
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
