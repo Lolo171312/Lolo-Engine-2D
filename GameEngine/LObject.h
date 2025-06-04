@@ -51,6 +51,14 @@ public:
 	inline void AddObjectRotation(float addAngle) { _transform._angle += addAngle; }
 	inline void AddObjectScale(const glm::vec2& addScale) { _transform._scale += addScale; }
 
+	/*
+	* Transform Getter Functions
+	*/
+	inline const glm::vec2& GetObjectLocation() const { return _transform._location; }
+	inline float GetObjectAngle() const { return _transform._angle; }
+	inline const glm::vec2& GetObjectScale() const { return _transform._scale; }
+	inline const Transform& GetObjectTransform() const { return _transform; }
+
 private:
 	void LoadTexture(const char* texDir, int* width, int* height);
 	void GenerateMesh(const int* width, const int* height);

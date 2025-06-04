@@ -131,6 +131,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CCollider.cpp" />
+    <ClCompile Include="CColliderCircle.cpp" />
+    <ClCompile Include="ColliderManager.cpp" />
     <ClCompile Include="CTextureRenderer.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="glad.c" />
@@ -140,6 +143,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CCollider.h" />
+    <ClInclude Include="CColliderCircle.h" />
+    <ClInclude Include="ColliderManager.h" />
     <ClInclude Include="CTextureRenderer.h" />
     <ClInclude Include="LComponent.h" />
     <ClInclude Include="LObject.h" />

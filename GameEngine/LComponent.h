@@ -26,7 +26,9 @@ public:
 	/*
 	* Getter for _isActive variable
 	*/
-	inline bool GetIsActive() { return _isActive; }
+	inline bool GetIsActive() const { return _isActive; }
+
+	inline const LObject* GetOwner() const { return _owner; }
 
 private:
 	const LObject* _owner;
