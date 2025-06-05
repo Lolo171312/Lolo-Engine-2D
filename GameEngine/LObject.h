@@ -5,6 +5,7 @@
 
 class Shader;
 class LComponent;
+class CCollider;
 
 struct Transform 
 {
@@ -32,7 +33,8 @@ public:
 	/*
 	* Constructor and Destructor
 	*/
-	LObject(Shader* shaderPtr, const Transform& initialTransform = Transform());
+	LObject(Shader* shaderPtr, const Transform& initialTransform = Transform()) : _transform(initialTransform), _objectShader(shaderPtr)
+	{}
 	~LObject();
 
 	void AttachComponent(LComponent* newComponent);
@@ -40,15 +42,17 @@ public:
 
 	virtual void Update(float deltaTime);
 
+	virtual void OnCollisionEnter(CCollider* other);
+
 	/*
 	* Transform Functions
 	*/
 	inline void SetObjectLocation(const glm::vec2& newLocation) { _transform._location = newLocation; };
-	inline void SetObjectRotation(float newAngle) { _transform._angle = newAngle; };
+	inline void SetObjectAngle(float newAngle) { _transform._angle = newAngle; };
 	inline void SetObjectScale(const glm::vec2& newScale) { _transform._scale = newScale; };
 
 	inline void AddObjectLocation(const glm::vec2& addLocation) { _transform._location += addLocation; }
-	inline void AddObjectRotation(float addAngle) { _transform._angle += addAngle; }
+	inline void AddObjectAngle(float addAngle) { _transform._angle += addAngle; }
 	inline void AddObjectScale(const glm::vec2& addScale) { _transform._scale += addScale; }
 
 	/*
@@ -60,9 +64,6 @@ public:
 	inline const Transform& GetObjectTransform() const { return _transform; }
 
 private:
-	void LoadTexture(const char* texDir, int* width, int* height);
-	void GenerateMesh(const int* width, const int* height);
-
 	/*
 	* Modifies Shader´s model matrix before the update according to the _transform values
 	*/
@@ -70,12 +71,6 @@ private:
 
 	/*Transform Variables*/
 	Transform _transform;
-
-	/*Texture Variables*/
-	unsigned int _textureId;
-
-	/*Mesh Variables*/
-	unsigned int _VAO;
 
 	/*Shader Variables*/
 	Shader* _objectShader = nullptr;

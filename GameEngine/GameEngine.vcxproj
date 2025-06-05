@@ -133,6 +133,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CCollider.cpp" />
     <ClCompile Include="CColliderCircle.cpp" />
+    <ClCompile Include="CColliderRect.cpp" />
     <ClCompile Include="ColliderManager.cpp" />
     <ClCompile Include="CTextureRenderer.cpp" />
     <ClCompile Include="GameEngine.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CCollider.h" />
     <ClInclude Include="CColliderCircle.h" />
+    <ClInclude Include="CColliderRect.h" />
     <ClInclude Include="ColliderManager.h" />
     <ClInclude Include="CTextureRenderer.h" />
     <ClInclude Include="LComponent.h" />

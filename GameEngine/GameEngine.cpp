@@ -13,6 +13,7 @@
 #include "LObject.h"
 #include "CTextureRenderer.h"
 #include "CColliderCircle.h"
+#include "CColliderRect.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -146,18 +147,25 @@ int main(void)
     myShader.SetIntUniform("texture1", 0);
 
     LObject* myObject = new LObject(&myShader);
-    myObject->SetObjectLocation(glm::vec2(470.0f, 300.0f));
+    myObject->SetObjectLocation(glm::vec2(280.0f, 300.0f));
     CTextureRenderer* TextureRenderer = new CTextureRenderer("../Content/bee.png");
     CColliderCircle* Collider = new CColliderCircle(46.0f);
     myObject->AttachComponent(TextureRenderer);
     myObject->AttachComponent(Collider);
 
     LObject* myOtherObject = new LObject(&myShader);
-    myOtherObject->SetObjectLocation(glm::vec2(0.0f, 300.0f));
-    CTextureRenderer* OtherTextureRenderer = new CTextureRenderer("../Content/container2.png");
-    CColliderCircle* Collider1 = new CColliderCircle(250.0f);
+    myOtherObject->SetObjectLocation(glm::vec2(150.0f, 300.0f));
+    CTextureRenderer* OtherTextureRenderer = new CTextureRenderer("../Content/box.png");
+    CColliderRect* OtherCollider = new CColliderRect(100.0f, 100.0f);
     myOtherObject->AttachComponent(OtherTextureRenderer);
-    myOtherObject->AttachComponent(Collider1);
+    myOtherObject->AttachComponent(OtherCollider);
+
+    LObject* ballObject = new LObject(&myShader);
+    ballObject->SetObjectLocation(glm::vec2(500.0f, 300.0f));
+    CTextureRenderer* BallTextureRenderer = new CTextureRenderer("../Content/ball.png");
+    CColliderCircle* BallCollider = new CColliderCircle(50.0f);
+    ballObject->AttachComponent(BallTextureRenderer);
+    ballObject->AttachComponent(BallCollider);
 
     float speed = 200.0f;
 
@@ -178,6 +186,14 @@ int main(void)
         {
             myObject->AddObjectLocation(glm::vec2(-1.0f, 0.0f) * speed * deltaTime);
         }
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        {
+            myObject->AddObjectLocation(glm::vec2(0.0f, -1.0f) * speed * deltaTime);
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        {
+            myObject->AddObjectLocation(glm::vec2(0.0f, 1.0f) * speed * deltaTime);
+        }
 
         //Rendering
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
@@ -185,6 +201,7 @@ int main(void)
 
         myOtherObject->Update(deltaTime);
         myObject->Update(deltaTime);
+        ballObject->Update(deltaTime);
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);

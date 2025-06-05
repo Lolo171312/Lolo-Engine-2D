@@ -9,7 +9,7 @@ public:
 	/*
 	* This function is called when the Component is attached to an LObject
 	*/
-	virtual void AttachComponent(const LObject* ownerPtr);
+	virtual void AttachComponent(LObject* ownerPtr);
 
 	/*
 	* This function is called every frame is the component is active
@@ -30,7 +30,7 @@ public:
 
 	inline const LObject* GetOwner() const { return _owner; }
 
-private:
-	const LObject* _owner;
+protected:
+	LObject* _owner;
 	bool _isActive = true;
 };

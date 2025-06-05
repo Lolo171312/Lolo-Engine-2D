@@ -1,6 +1,6 @@
 #include "LComponent.h"
 
-void LComponent::AttachComponent(const LObject* ownerPtr)
+void LComponent::AttachComponent(LObject* ownerPtr)
 {
 	_owner = ownerPtr;
 }
