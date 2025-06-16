@@ -14,6 +14,7 @@
 #include "CTextureRenderer.h"
 #include "CColliderCircle.h"
 #include "CColliderRect.h"
+#include "TextRenderer.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -23,35 +24,23 @@ float prevTime = 0.0f;
 
 //Create vertex Shader
 const char* vertexShaderSource = "#version 330 core\n" //Create shader source C-style string
-"layout (location = 0) in vec3 aPos;\n"
-"layout (location = 1) in vec2 aTexCoords;\n"
+"layout (location = 0) in vec2 aPos;\n"
 "\n"
 "uniform mat4 model;\n"
 "uniform mat4 projection;\n"
-"uniform vec3 color;"
-"\n"
-"out vec3 Color;"
-"out vec2 TexCoords;"
 "\n"
 "void main()\n"
 "{\n"
-//"   gl_Position = projection * model * vec4(aPos, 1.0f);\n"
-"   gl_Position = projection * model * vec4(aPos, 1.0f);\n"
-"   Color = color;"
-"   TexCoords = aTexCoords;"
+"   gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);\n"
 "}\0";
 
 //Create fragment shader
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;"
 "\n"
-"uniform sampler2D texture1;"
-"\n"
-"in vec2 TexCoords;"
-"\n"
 "void main()\n"
 "{\n"
-"   FragColor = texture(texture1, TexCoords);"
+"   FragColor = vec4(1.0f);"
 "}\0";
 
 const char* simpleVertexShaderSource = "#version 330 core\n" //Create shader source C-style string
@@ -147,6 +136,11 @@ int main(void)
     myShader.SetIntUniform("texture1", 0);
     glUseProgram(0);
 
+    Shader textShader(vertexShaderSource, fragmentShaderSource);
+    textShader.UseShader();
+    textShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
+    glUseProgram(0);
+
     LObject* myObject = new LObject(&myShader);
     myObject->SetObjectLocation(glm::vec2(280.0f, 300.0f));
     CTextureRenderer* TextureRenderer = new CTextureRenderer("../Content/bee.png");
@@ -167,6 +161,8 @@ int main(void)
     CColliderCircle* BallCollider = new CColliderCircle(50.0f);
     ballObject->AttachComponent(BallTextureRenderer);
     ballObject->AttachComponent(BallCollider);
+
+    TextRenderer myTextRenderer(50.0f, &textShader);
 
     float speed = 200.0f;
 
@@ -203,6 +199,9 @@ int main(void)
         myOtherObject->Update(deltaTime);
         myObject->Update(deltaTime);
         ballObject->Update(deltaTime);
+
+        myTextRenderer.RenderText("Hola", glm::vec2(50.0f, 25.0f));
+        myTextRenderer.RenderText("Me llamo L", glm::vec2(200.0f, 450.0f));
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
