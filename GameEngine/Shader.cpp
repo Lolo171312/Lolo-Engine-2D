@@ -70,7 +70,8 @@ void Shader::SetIntUniform(const char* uniformName, int newValue) const
 
 void Shader::SetMatrix4Uniform(const char* uniformName, const GLfloat* newValue) const
 {
-	glUniformMatrix4fv(glGetUniformLocation(Id, uniformName), 1, GL_FALSE, newValue);
+	GLuint uniformId = glGetUniformLocation(Id, uniformName);
+	glUniformMatrix4fv(uniformId, 1, GL_FALSE, newValue);
 }
 
 void Shader::SetVec3Uniform(const char* uniformName, const glm::vec3& newValue) const

@@ -145,6 +145,7 @@ int main(void)
     glm::mat4 projection = glm::ortho(0.0f, horizontalCoord, verticalCoord, 0.0f, 0.1f, 100.0f);
     myShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
     myShader.SetIntUniform("texture1", 0);
+    glUseProgram(0);
 
     LObject* myObject = new LObject(&myShader);
     myObject->SetObjectLocation(glm::vec2(280.0f, 300.0f));
