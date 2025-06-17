@@ -25,22 +25,31 @@ float prevTime = 0.0f;
 //Create vertex Shader
 const char* vertexShaderSource = "#version 330 core\n" //Create shader source C-style string
 "layout (location = 0) in vec2 aPos;\n"
+"layout (location = 1) in vec2 aTextCoords;\n"
 "\n"
 "uniform mat4 model;\n"
 "uniform mat4 projection;\n"
 "\n"
+"out vec2 TextCoords;"
+"\n"
 "void main()\n"
 "{\n"
 "   gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);\n"
+"   TextCoords = aTextCoords;"
 "}\0";
 
 //Create fragment shader
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;"
 "\n"
+"in vec2 TextCoords;"
+"\n"
+"uniform sampler2D text;"
+"\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f);"
+"   vec4 sampled = vec4(1.0f, 1.0f, 1.0f, texture(text, TextCoords).r);"
+"   FragColor = vec4(1.0f) * sampled;"
 "}\0";
 
 const char* simpleVertexShaderSource = "#version 330 core\n" //Create shader source C-style string
@@ -162,7 +171,7 @@ int main(void)
     ballObject->AttachComponent(BallTextureRenderer);
     ballObject->AttachComponent(BallCollider);
 
-    TextRenderer myTextRenderer(50.0f, &textShader);
+    TextRenderer myTextRenderer(48.0f, &textShader);
 
     float speed = 200.0f;
 
@@ -200,8 +209,8 @@ int main(void)
         myObject->Update(deltaTime);
         ballObject->Update(deltaTime);
 
-        myTextRenderer.RenderText("Hola", glm::vec2(50.0f, 25.0f));
-        myTextRenderer.RenderText("Me llamo L", glm::vec2(200.0f, 450.0f));
+        myTextRenderer.RenderText("hola", glm::vec2(50.0f, 25.0f));
+        myTextRenderer.RenderText("texto y prueba", glm::vec2(120.0f, 450.0f));
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
