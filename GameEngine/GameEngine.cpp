@@ -45,11 +45,12 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "in vec2 TextCoords;"
 "\n"
 "uniform sampler2D text;"
+"uniform vec3 color;"
 "\n"
 "void main()\n"
 "{\n"
 "   vec4 sampled = vec4(1.0f, 1.0f, 1.0f, texture(text, TextCoords).r);"
-"   FragColor = vec4(1.0f) * sampled;"
+"   FragColor = vec4(color, 1.0f) * sampled;"
 "}\0";
 
 const char* simpleVertexShaderSource = "#version 330 core\n" //Create shader source C-style string
@@ -171,7 +172,7 @@ int main(void)
     ballObject->AttachComponent(BallTextureRenderer);
     ballObject->AttachComponent(BallCollider);
 
-    TextRenderer myTextRenderer(48.0f, &textShader);
+    TextRenderer myTextRenderer(45.0f, &textShader);
 
     float speed = 200.0f;
 
@@ -209,8 +210,12 @@ int main(void)
         myObject->Update(deltaTime);
         ballObject->Update(deltaTime);
 
-        myTextRenderer.RenderText("hola", glm::vec2(50.0f, 25.0f));
-        myTextRenderer.RenderText("texto y prueba", glm::vec2(120.0f, 450.0f));
+        float scaleVal = sinf(glfwGetTime());
+        scaleVal = glm::clamp(scaleVal, 0.1f, 1.0f);
+
+        myTextRenderer.RenderText("Hola cómo estás?", glm::vec2(50.0f, 50.0f), scaleVal);
+        myTextRenderer.RenderText("Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 0.5f, glm::vec3(0.0f, 0.5f, 0.5f));
+        myTextRenderer.RenderText("Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
