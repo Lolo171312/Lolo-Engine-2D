@@ -1,5 +1,5 @@
 #include "TextRenderer.h"
-#include <iostream>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Shader.h"
@@ -8,112 +8,42 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-TextRenderer::TextRenderer(float pixelFontSize, Shader* shaderPtr) : _shaderPtr(shaderPtr), _characterSize(pixelFontSize)
+Font TextRenderer::LoadFont(const char* fontFileDir, float pixelSize)
 {
-	if(_shaderPtr != nullptr)
+	if (_shaderPtr != nullptr)
 	{
 		_shaderPtr->UseShader();
 	}
 
-	LoadFont(pixelFontSize);
-
-	/*float vertices[]
-	{
-		0.0f, 0.0f, 0.0f, 0.0f,
-		pixelFontSize, 0.0f, 1.0f, 0.0f,
-		pixelFontSize, pixelFontSize, 1.0f, 1.0f,
-		0.0f, pixelFontSize, 0.0f, 1.0f
-	};
-
-	unsigned int indices[]
-	{
-		0, 1, 2,
-		0, 2, 3
-	};
-
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)(sizeof(float) * 2));
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
-}
-
-void TextRenderer::RenderText(const char* text, glm::vec2 position, float textScale, glm::vec3 textColor)
-{
-	unsigned int index = 0;
-	float x = position.x;
-	while (*(text + index) != '\0')
-	{
-		Character characterData = _characters[*(text + index)];
-
-		float xPos = x + characterData.bearing.x * textScale;
-		float yPos = position.y - characterData.bearing.y * textScale;
-		glm::mat4 charModelMatrix = glm::mat4(1.0f);
-		charModelMatrix = glm::translate(charModelMatrix, glm::vec3(xPos, yPos, 0.0f));
-		charModelMatrix = glm::scale(charModelMatrix, glm::vec3(textScale, textScale, 1.0f));
-
-		if (_shaderPtr != nullptr)
-		{
-			_shaderPtr->UseShader();
-			_shaderPtr->SetMatrix4Uniform("model", glm::value_ptr(charModelMatrix));
-			_shaderPtr->SetVec3Uniform("color", textColor);
-		}
-
-		glActiveTexture(GL_TEXTURE0);
-
-		glBindTexture(GL_TEXTURE_2D, characterData.textureId);
-
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glBindVertexArray(characterData.vao);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-		x += (characterData.advance >> 6) * textScale;
-
-		++index;
-	}
-}
-
-void TextRenderer::LoadFont(float pixelSize)
-{
 	//Load FreeTrype Library
 	FT_Library ft;
-	if(FT_Init_FreeType(&ft))
+	if (FT_Init_FreeType(&ft))
 	{
 		std::cout << "Could not init FreeType Library" << std::endl;
-		return;
+		return -1;
 	}
 
 	//Load Font
 	FT_Face face;
-	if(FT_New_Face(ft, "../Content/Fonts/basis33.ttf", 0, &face))
+	if (FT_New_Face(ft, fontFileDir, 0, &face))
 	{
 		std::cout << "Could not load new font" << std::endl;
-		return;
+		return -1;
 	}
+
+	//Determine current Font id
+	unsigned int fontId = _fonts.size();
 
 	//Set pixel size
 	FT_Set_Pixel_Sizes(face, 0, pixelSize);
 
+	std::map<char, Character> fontCharacters;
 	//Iterate through every character and get their data
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	for (unsigned char c = 0; c < 255; ++c)
 	{
 		//Load the current char
-		if(FT_Load_Char(face, c, FT_LOAD_RENDER))
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 		{
 			std::cout << "Could not load character" << std::endl;
 			continue;
@@ -128,7 +58,7 @@ void TextRenderer::LoadFont(float pixelSize)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		
+
 		//Generate char mesh
 		//Define vertices
 		float vertices[]
@@ -176,10 +106,64 @@ void TextRenderer::LoadFont(float pixelSize)
 		};
 
 		//Insert the created struct in _character map asocciated with the current char
-		_characters.insert(std::pair<char, Character>(c, newCharacter));
+		fontCharacters.insert(std::pair<char, Character>(c, newCharacter));
 	}
+
+	_fonts.push_back(fontCharacters);
 
 	//Every char data is loaded so we can unload FreeType´s Library and Font
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
+
+	return _fonts.size() - 1;
+}
+
+void TextRenderer::RenderText(Font font, const char* text, glm::vec2 position, float textScale, glm::vec3 textColor)
+{
+	if(_fonts.size() == 0)
+	{
+		std::cout << "TextRenderer ERROR: There are 0 fonts created! Use LoadFont to create one" << std::endl;
+		return;
+	}
+
+	if (font >= _fonts.size() || font < 0)
+	{
+		std::cout << "TextRenderer ERROR: The given font is out of range" << std::endl;
+		return;
+	}
+
+	unsigned int index = 0;
+	float x = position.x;
+
+	std::map<char, Character>& fontCharacters = _fonts[font];
+	
+	while (*(text + index) != '\0')
+	{
+		Character characterData = fontCharacters[*(text + index)];
+
+		float xPos = x + characterData.bearing.x * textScale;
+		float yPos = position.y - characterData.bearing.y * textScale;
+		glm::mat4 charModelMatrix = glm::mat4(1.0f);
+		charModelMatrix = glm::translate(charModelMatrix, glm::vec3(xPos, yPos, 0.0f));
+		charModelMatrix = glm::scale(charModelMatrix, glm::vec3(textScale, textScale, 1.0f));
+
+		if (_shaderPtr != nullptr)
+		{
+			_shaderPtr->UseShader();
+			_shaderPtr->SetMatrix4Uniform("model", glm::value_ptr(charModelMatrix));
+			_shaderPtr->SetVec3Uniform("color", textColor);
+		}
+
+		glActiveTexture(GL_TEXTURE0);
+
+		glBindTexture(GL_TEXTURE_2D, characterData.textureId);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindVertexArray(characterData.vao);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		x += (characterData.advance >> 6) * textScale;
+
+		++index;
+	}
 }

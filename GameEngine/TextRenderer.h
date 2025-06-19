@@ -2,6 +2,8 @@
 
 #include "glm/glm/glm.hpp"
 #include <map>
+#include <vector>
+#include <iostream>
 
 class Shader;
 
@@ -14,18 +16,18 @@ struct Character
 	unsigned int advance;
 };
 
+typedef unsigned int Font;
+
 class TextRenderer
 {
 public:
-	TextRenderer(float pixelFontSize, Shader* shaderPtr);
+	TextRenderer(float pixelFontSize, Shader* shaderPtr) : _shaderPtr(shaderPtr)
+	{}
 
-	void RenderText(const char* text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
+	Font LoadFont(const char* fontFileDir, float pixelSize);
+	void RenderText(Font font, const char* text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
 
 private:
-	void LoadFont(float pixelSize);
-
 	Shader* _shaderPtr = nullptr;
-
-	float _characterSize = 0.0f;
-	std::map<char, Character> _characters;
+	std::vector < std::map<char, Character>> _fonts;
 };

@@ -173,6 +173,8 @@ int main(void)
     ballObject->AttachComponent(BallCollider);
 
     TextRenderer myTextRenderer(45.0f, &textShader);
+    Font basisFont = myTextRenderer.LoadFont("../Content/Fonts/basis33.ttf", 45.0f);
+    Font monospacedFont = myTextRenderer.LoadFont("../Content/Fonts/Monospace.ttf", 45.0f);
 
     float speed = 200.0f;
 
@@ -213,9 +215,9 @@ int main(void)
         float scaleVal = sinf(glfwGetTime());
         scaleVal = glm::clamp(scaleVal, 0.1f, 1.0f);
 
-        myTextRenderer.RenderText("Hola cómo estás?", glm::vec2(50.0f, 50.0f), scaleVal);
-        myTextRenderer.RenderText("Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 0.5f, glm::vec3(0.0f, 0.5f, 0.5f));
-        myTextRenderer.RenderText("Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
+        myTextRenderer.RenderText(basisFont, "Hola cómo estás?", glm::vec2(50.0f, 50.0f), scaleVal);
+        myTextRenderer.RenderText(monospacedFont, "Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 1.0f, glm::vec3(0.0f, 0.5f, 0.5f));
+        myTextRenderer.RenderText(basisFont, "Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
