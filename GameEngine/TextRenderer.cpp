@@ -8,7 +8,12 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-TextRenderer::TextRenderer(float pixelFontSize, const glm::vec2& windowSize)
+TextRenderer::~TextRenderer()
+{
+	delete _shaderPtr;
+}
+
+void TextRenderer::InitializeTextRenderer(const glm::vec2& windowSize)
 {
 	_shaderPtr = new Shader("Shaders/textShader.vs.txt", "Shaders/textShader.fs.txt");
 	_shaderPtr->UseShader();
@@ -19,12 +24,7 @@ TextRenderer::TextRenderer(float pixelFontSize, const glm::vec2& windowSize)
 	_defaultFont = LoadFont("../Content/Fonts/basis33.ttf", 45.0f);
 }
 
-TextRenderer::~TextRenderer()
-{
-	delete _shaderPtr;
-}
-
-Font TextRenderer::LoadFont(const char* fontFileDir, float pixelSize)
+Font TextRenderer::LoadFontTR(const char* fontFileDir, float pixelSize)
 {
 	if (_shaderPtr != nullptr)
 	{
@@ -134,24 +134,20 @@ Font TextRenderer::LoadFont(const char* fontFileDir, float pixelSize)
 	return _fonts.size() - 1;
 }
 
-void TextRenderer::RenderText(Font font, const std::string& text, glm::vec2 position, float textScale, glm::vec3 textColor)
+void TextRenderer::RenderTextTR(Font font, const std::string& text, const glm::vec2& position, float textScale, const glm::vec3& textColor)
 {
-	if(_fonts.size() == 0)
+	if (_fonts.size() == 0)
 	{
-		std::cout << "TextRenderer ERROR: There are 0 fonts created! Use LoadFont to create one" << std::endl;
-		std::cout << "TextRenderer ERROR: Using default font" << std::endl;
 		font = _defaultFont;
 	}
 	if (font >= _fonts.size() || font < 0)
 	{
-		std::cout << "TextRenderer ERROR: The given font is out of range" << std::endl;
-		std::cout << "TextRenderer ERROR: Using default font" << std::endl;
 		font = _defaultFont;
 	}
 
 	float x = position.x;
 	std::map<char, Character>& fontCharacters = _fonts[font];
-	
+
 	for (std::string::const_iterator c = text.begin(); c != text.end(); ++c)
 	{
 		Character characterData = fontCharacters[*(c)];
@@ -181,7 +177,53 @@ void TextRenderer::RenderText(Font font, const std::string& text, glm::vec2 posi
 	}
 }
 
-void TextRenderer::RenderText(const std::string& text, glm::vec2 position, float textScale, glm::vec3 textColor)
+#pragma region UserAccessFunctions
+int InitTextRenderer(float windowWidth, float windowHeight)
 {
-	RenderText(_defaultFont, text, position, textScale, textColor);
+	TextRenderer::Init();
+	TextRenderer* instancePtr = TextRenderer::GetInstance();
+	if (instancePtr != nullptr)
+	{
+		instancePtr->InitializeTextRenderer(glm::vec2(windowWidth, windowHeight));
+		return 0;
+	}
+
+	return -1;
 }
+
+Font LoadFont(const char* fontFileDir, float pixelSize)
+{
+	TextRenderer* instancePtr = TextRenderer::GetInstance();
+	if (instancePtr != nullptr)
+	{
+		return instancePtr->LoadFontTR(fontFileDir, pixelSize);
+	}
+
+	std::cout << "ERROR: TextRenderer was not initialized!" << std::endl;
+	return -1;
+}
+
+void RenderText(Font font, const std::string& text, const glm::vec2& position, float textScale, const glm::vec3& textColor)
+{
+	TextRenderer* instancePtr = TextRenderer::GetInstance();
+	if (instancePtr != nullptr)
+	{
+		instancePtr->RenderTextTR(font, text, position, textScale, textColor);
+		return;
+	}
+
+	std::cout << "ERROR: TextRenderer was not initialized!" << std::endl;
+}
+
+void RenderText(const std::string& text, const glm::vec2& position, float textScale, const glm::vec3& textColor)
+{
+	TextRenderer* instancePtr = TextRenderer::GetInstance();
+	if (instancePtr != nullptr)
+	{
+		instancePtr->RenderTextTR(instancePtr->GetDefaultFont(), text, position, textScale, textColor);
+		return;
+	}
+
+	std::cout << "ERROR: TextRenderer was not initialized!" << std::endl;
+}
+#pragma endregion UserAccessFunctions

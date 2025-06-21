@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include "SingletonBase.h"
 
 class Shader;
 
@@ -19,15 +20,16 @@ struct Character
 
 typedef unsigned int Font;
 
-class TextRenderer
+class TextRenderer : public SingletonBase<TextRenderer>
 {
 public:
-	TextRenderer(float pixelFontSize, const glm::vec2& windowSize);
 	~TextRenderer();
 
-	Font LoadFont(const char* fontFileDir, float pixelSize);
-	void RenderText(Font font, const std::string& text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
-	void RenderText(const std::string& text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
+	void InitializeTextRenderer(const glm::vec2& windowSize);
+	Font LoadFontTR(const char* fontFileDir, float pixelSize);
+	void RenderTextTR(Font font, const std::string& text, const glm::vec2& position, float textScale = 1.0f, const glm::vec3& textColor = glm::vec3(1.0f));
+
+	inline Font GetDefaultFont() const { return _defaultFont; }
 
 private:
 	Shader* _shaderPtr = nullptr;
@@ -35,3 +37,11 @@ private:
 
 	Font _defaultFont = -1;
 };
+
+/*
+* User Access Functions
+*/
+int InitTextRenderer(float windowWidth, float windowHeight);
+Font LoadFont(const char* fontFileDir, float pixelSize);
+void RenderText(Font font, const std::string& text, const glm::vec2& position, float textScale = 1.0f, const glm::vec3& textColor = glm::vec3(1.0f));
+void RenderText(const std::string& text, const glm::vec2& position, float textScale = 1.0f, const glm::vec3& textColor = glm::vec3(1.0f));
