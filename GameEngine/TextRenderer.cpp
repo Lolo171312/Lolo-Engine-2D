@@ -118,28 +118,25 @@ Font TextRenderer::LoadFont(const char* fontFileDir, float pixelSize)
 	return _fonts.size() - 1;
 }
 
-void TextRenderer::RenderText(Font font, const char* text, glm::vec2 position, float textScale, glm::vec3 textColor)
+void TextRenderer::RenderText(Font font, const std::string& text, glm::vec2 position, float textScale, glm::vec3 textColor)
 {
 	if(_fonts.size() == 0)
 	{
 		std::cout << "TextRenderer ERROR: There are 0 fonts created! Use LoadFont to create one" << std::endl;
 		return;
 	}
-
 	if (font >= _fonts.size() || font < 0)
 	{
 		std::cout << "TextRenderer ERROR: The given font is out of range" << std::endl;
 		return;
 	}
 
-	unsigned int index = 0;
 	float x = position.x;
-
 	std::map<char, Character>& fontCharacters = _fonts[font];
 	
-	while (*(text + index) != '\0')
+	for (std::string::const_iterator c = text.begin(); c != text.end(); ++c)
 	{
-		Character characterData = fontCharacters[*(text + index)];
+		Character characterData = fontCharacters[*(c)];
 
 		float xPos = x + characterData.bearing.x * textScale;
 		float yPos = position.y - characterData.bearing.y * textScale;
@@ -163,7 +160,5 @@ void TextRenderer::RenderText(Font font, const char* text, glm::vec2 position, f
 		glBindVertexArray(characterData.vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		x += (characterData.advance >> 6) * textScale;
-
-		++index;
 	}
 }

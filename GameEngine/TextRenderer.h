@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <string>
 
 class Shader;
 
@@ -25,7 +26,7 @@ public:
 	{}
 
 	Font LoadFont(const char* fontFileDir, float pixelSize);
-	void RenderText(Font font, const char* text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
+	void RenderText(Font font, const std::string& text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
 
 private:
 	Shader* _shaderPtr = nullptr;
