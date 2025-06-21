@@ -8,6 +8,22 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+TextRenderer::TextRenderer(float pixelFontSize, const glm::vec2& windowSize)
+{
+	_shaderPtr = new Shader("Shaders/textShader.vs.txt", "Shaders/textShader.fs.txt");
+	_shaderPtr->UseShader();
+	glm::mat4 projection = glm::ortho(0.0f, windowSize.x, windowSize.y, 0.0f, 0.1f, 100.0f);
+	_shaderPtr->SetMatrix4Uniform("projection", glm::value_ptr(projection));
+	glUseProgram(0);
+
+	_defaultFont = LoadFont("../Content/Fonts/basis33.ttf", 45.0f);
+}
+
+TextRenderer::~TextRenderer()
+{
+	delete _shaderPtr;
+}
+
 Font TextRenderer::LoadFont(const char* fontFileDir, float pixelSize)
 {
 	if (_shaderPtr != nullptr)
@@ -123,12 +139,14 @@ void TextRenderer::RenderText(Font font, const std::string& text, glm::vec2 posi
 	if(_fonts.size() == 0)
 	{
 		std::cout << "TextRenderer ERROR: There are 0 fonts created! Use LoadFont to create one" << std::endl;
-		return;
+		std::cout << "TextRenderer ERROR: Using default font" << std::endl;
+		font = _defaultFont;
 	}
 	if (font >= _fonts.size() || font < 0)
 	{
 		std::cout << "TextRenderer ERROR: The given font is out of range" << std::endl;
-		return;
+		std::cout << "TextRenderer ERROR: Using default font" << std::endl;
+		font = _defaultFont;
 	}
 
 	float x = position.x;
@@ -161,4 +179,9 @@ void TextRenderer::RenderText(Font font, const std::string& text, glm::vec2 posi
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		x += (characterData.advance >> 6) * textScale;
 	}
+}
+
+void TextRenderer::RenderText(const std::string& text, glm::vec2 position, float textScale, glm::vec3 textColor)
+{
+	RenderText(_defaultFont, text, position, textScale, textColor);
 }

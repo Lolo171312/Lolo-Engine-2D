@@ -23,6 +23,7 @@ public:
 
 private:
 	unsigned int CreateShader(const char* shaderSourceCode, GLuint shaderType);
+	char* ReadShaderFile(const char* shaderFileDir);
 
 	unsigned int Id;
 };

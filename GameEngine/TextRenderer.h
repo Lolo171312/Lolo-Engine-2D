@@ -22,13 +22,16 @@ typedef unsigned int Font;
 class TextRenderer
 {
 public:
-	TextRenderer(float pixelFontSize, Shader* shaderPtr) : _shaderPtr(shaderPtr)
-	{}
+	TextRenderer(float pixelFontSize, const glm::vec2& windowSize);
+	~TextRenderer();
 
 	Font LoadFont(const char* fontFileDir, float pixelSize);
 	void RenderText(Font font, const std::string& text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
+	void RenderText(const std::string& text, glm::vec2 position, float textScale = 1.0f, glm::vec3 textColor = glm::vec3(1.0f));
 
 private:
 	Shader* _shaderPtr = nullptr;
 	std::vector < std::map<char, Character>> _fonts;
+
+	Font _defaultFont = -1;
 };

@@ -23,65 +23,6 @@ const int WINDOW_HEIGHT = 600;
 float deltaTime = 0.0f;
 float prevTime = 0.0f;
 
-//Create vertex Shader
-const char* vertexShaderSource = "#version 330 core\n" //Create shader source C-style string
-"layout (location = 0) in vec2 aPos;\n"
-"layout (location = 1) in vec2 aTextCoords;\n"
-"\n"
-"uniform mat4 model;\n"
-"uniform mat4 projection;\n"
-"\n"
-"out vec2 TextCoords;"
-"\n"
-"void main()\n"
-"{\n"
-"   gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);\n"
-"   TextCoords = aTextCoords;"
-"}\0";
-
-//Create fragment shader
-const char* fragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;"
-"\n"
-"in vec2 TextCoords;"
-"\n"
-"uniform sampler2D text;"
-"uniform vec3 color;"
-"\n"
-"void main()\n"
-"{\n"
-"   vec4 sampled = vec4(1.0f, 1.0f, 1.0f, texture(text, TextCoords).r);"
-"   FragColor = vec4(color, 1.0f) * sampled;"
-"}\0";
-
-const char* simpleVertexShaderSource = "#version 330 core\n" //Create shader source C-style string
-"layout (location = 0) in vec2 aPos;\n"
-"layout (location = 1) in vec2 aTexCoords;\n"
-"\n"
-"uniform mat4 model;\n"
-"uniform mat4 projection;\n"
-"\n"
-"out vec2 TexCoords;"
-"\n"
-"void main()\n"
-"{\n"
-"   gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);\n"
-"   TexCoords = aTexCoords;"
-"}\0";
-
-//Create fragment shader
-const char* simpleFragmentShaderSource = "#version 330 core\n"
-"out vec4 FragColor;"
-"\n"
-"in vec2 TexCoords;"
-"\n"
-"uniform sampler2D texture1;"
-"\n"
-"void main()\n"
-"{\n"
-"   FragColor = texture(texture1, TexCoords);"
-"}\0";
-
 //Called every time the viewport´s size is set
 void FrameBuffer_Size_Callback(GLFWwindow* window, int width, int height) 
 {
@@ -138,18 +79,13 @@ int main(void)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-    Shader myShader(simpleVertexShaderSource, simpleFragmentShaderSource);
+    Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
     myShader.UseShader();
     float horizontalCoord = (float)WINDOW_WIDTH;
     float verticalCoord = (float)WINDOW_HEIGHT;
     glm::mat4 projection = glm::ortho(0.0f, horizontalCoord, verticalCoord, 0.0f, 0.1f, 100.0f);
     myShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
     myShader.SetIntUniform("texture1", 0);
-    glUseProgram(0);
-
-    Shader textShader(vertexShaderSource, fragmentShaderSource);
-    textShader.UseShader();
-    textShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
     glUseProgram(0);
 
     LObject* myObject = new LObject(&myShader);
@@ -173,8 +109,8 @@ int main(void)
     ballObject->AttachComponent(BallTextureRenderer);
     ballObject->AttachComponent(BallCollider);
 
-    TextRenderer myTextRenderer(45.0f, &textShader);
-    Font basisFont = myTextRenderer.LoadFont("../Content/Fonts/basis33.ttf", 45.0f);
+    TextRenderer myTextRenderer(45.0f, glm::vec2(horizontalCoord, verticalCoord));
+    Font basisFont = myTextRenderer.LoadFont("../Content/Fonts/Dotrice.otf", 45.0f);
     Font monospacedFont = myTextRenderer.LoadFont("../Content/Fonts/Monospace.ttf", 45.0f);
 
     float speed = 200.0f;
@@ -216,9 +152,10 @@ int main(void)
         float scaleVal = sinf(glfwGetTime());
         scaleVal = glm::clamp(scaleVal, 0.1f, 1.0f);
 
-        myTextRenderer.RenderText(basisFont, "Hola cómo estás?" + std::to_string(10), glm::vec2(50.0f, 50.0f), scaleVal);
+        myTextRenderer.RenderText(basisFont, "Hola como estas?" + std::to_string(10), glm::vec2(50.0f, 50.0f), scaleVal);
         myTextRenderer.RenderText(monospacedFont, "Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 1.0f, glm::vec3(0.0f, 0.5f, 0.5f));
         myTextRenderer.RenderText(basisFont, "Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
+        myTextRenderer.RenderText("Using default Font :o", glm::vec2(250.0f, 145.0f), 1.00f, glm::vec3(1.0f, 1.0f, 0.0f));
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);

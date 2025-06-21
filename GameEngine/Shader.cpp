@@ -2,11 +2,25 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
 
 Shader::Shader(const char* vertexShader, const char* fragmentShader)
 {
-	unsigned int vertexShaderId = CreateShader(vertexShader, GL_VERTEX_SHADER);
-	unsigned int fragmentShaderId = CreateShader(fragmentShader, GL_FRAGMENT_SHADER);
+	char* vertexShaderCode = ReadShaderFile(vertexShader);
+	if(vertexShaderCode == nullptr)
+	{
+		return;
+	}
+
+	char* fragmentShaderCode = ReadShaderFile(fragmentShader);
+	if (fragmentShaderCode == nullptr)
+	{
+		return;
+	}
+
+	unsigned int vertexShaderId = CreateShader(vertexShaderCode, GL_VERTEX_SHADER);
+	unsigned int fragmentShaderId = CreateShader(fragmentShaderCode, GL_FRAGMENT_SHADER);
 
 	if (vertexShaderId == -1 || fragmentShaderId == -1) return;
 
@@ -26,6 +40,8 @@ Shader::Shader(const char* vertexShader, const char* fragmentShader)
 
 	glDeleteShader(vertexShaderId);
 	glDeleteShader(fragmentShaderId);
+	free(vertexShaderCode);
+	free(fragmentShaderCode);
 }
 
 Shader::~Shader()
@@ -56,6 +72,36 @@ unsigned int Shader::CreateShader(const char* shaderSourceCode, GLuint shaderTyp
 	}
 
 	return shaderId;
+}
+
+char* Shader::ReadShaderFile(const char* shaderFileDir)
+{
+	FILE* shaderFile;
+	fopen_s(&shaderFile, shaderFileDir, "rb");
+	if (!shaderFile)
+	{
+		std::cout << "SHADER ERROR: Could not find shader" << std::endl;
+		return nullptr;
+	}
+
+	fseek(shaderFile, 0, SEEK_END);
+	long size = ftell(shaderFile);
+	rewind(shaderFile);
+
+	char* shaderBuffer = (char*)malloc(size + 1);
+	if (!shaderBuffer)
+	{
+		std::cout << "SHADER ERROR: Could not create shader buffer" << std::endl;
+		fclose(shaderFile);
+		return nullptr;
+	}
+
+	fread(shaderBuffer, 1, size, shaderFile);
+	shaderBuffer[size] = '\0';
+
+	fclose(shaderFile);
+
+	return shaderBuffer;
 }
 
 void Shader::SetFloatUniform(const char* uniformName, GLfloat newValue) const
