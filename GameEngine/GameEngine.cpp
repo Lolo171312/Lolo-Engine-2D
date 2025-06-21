@@ -166,7 +166,7 @@ int main(void)
         //myTextRenderer.RenderText(monospacedFont, "Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 1.0f, glm::vec3(0.0f, 0.5f, 0.5f));
         //myTextRenderer.RenderText(basisFont, "Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
         //myTextRenderer.RenderText("Using default Font :o", glm::vec2(250.0f, 145.0f), 1.00f, glm::vec3(1.0f, 1.0f, 0.0f));
-        RenderText(basisFont, "Hola como estas?" + std::to_string(10), glm::vec2(50.0f, 50.0f), scaleVal);
+        RenderText(basisFont, "H\nola como\nestas?" + std::to_string(10), glm::vec2(50.0f, 50.0f), scaleVal);
         RenderText(monospacedFont, "Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 1.0f, glm::vec3(0.0f, 0.5f, 0.5f));
         RenderText(basisFont, "Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
         RenderText("Using default Font :o", glm::vec2(250.0f, 145.0f), 1.00f, glm::vec3(1.0f, 1.0f, 0.0f));

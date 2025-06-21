@@ -18,7 +18,14 @@ struct Character
 	unsigned int advance;
 };
 
-typedef unsigned int Font;
+//typedef unsigned int Font;
+struct Font
+{
+	Font(unsigned int _id, float _size) : id(_id), pixelSize(_size)
+	{}
+	unsigned int id = 0;
+	float pixelSize = 0.0f;
+};
 
 class TextRenderer : public SingletonBase<TextRenderer>
 {
@@ -35,7 +42,7 @@ private:
 	Shader* _shaderPtr = nullptr;
 	std::vector < std::map<char, Character>> _fonts;
 
-	Font _defaultFont = -1;
+	Font _defaultFont = Font(-1, 0.0f);
 };
 
 /*

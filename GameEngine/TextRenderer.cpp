@@ -36,7 +36,7 @@ Font TextRenderer::LoadFontTR(const char* fontFileDir, float pixelSize)
 	if (FT_Init_FreeType(&ft))
 	{
 		std::cout << "Could not init FreeType Library" << std::endl;
-		return -1;
+		return Font(-1, 0.0f);
 	}
 
 	//Load Font
@@ -44,7 +44,7 @@ Font TextRenderer::LoadFontTR(const char* fontFileDir, float pixelSize)
 	if (FT_New_Face(ft, fontFileDir, 0, &face))
 	{
 		std::cout << "Could not load new font" << std::endl;
-		return -1;
+		return Font(-1, 0.0f);
 	}
 
 	//Determine current Font id
@@ -131,7 +131,7 @@ Font TextRenderer::LoadFontTR(const char* fontFileDir, float pixelSize)
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
 
-	return _fonts.size() - 1;
+	return Font(_fonts.size() - 1, pixelSize);
 }
 
 void TextRenderer::RenderTextTR(Font font, const std::string& text, const glm::vec2& position, float textScale, const glm::vec3& textColor)
@@ -140,20 +140,28 @@ void TextRenderer::RenderTextTR(Font font, const std::string& text, const glm::v
 	{
 		font = _defaultFont;
 	}
-	if (font >= _fonts.size() || font < 0)
+	if (font.id >= _fonts.size() || font.id < 0)
 	{
 		font = _defaultFont;
 	}
 
 	float x = position.x;
-	std::map<char, Character>& fontCharacters = _fonts[font];
+	float y = position.y;
+	std::map<char, Character>& fontCharacters = _fonts[font.id];
 
 	for (std::string::const_iterator c = text.begin(); c != text.end(); ++c)
 	{
+		if(*c == '\n')
+		{
+			x = position.x;
+			y += font.pixelSize * textScale;
+			continue;
+		}
+
 		Character characterData = fontCharacters[*(c)];
 
 		float xPos = x + characterData.bearing.x * textScale;
-		float yPos = position.y - characterData.bearing.y * textScale;
+		float yPos = y - characterData.bearing.y * textScale;
 		glm::mat4 charModelMatrix = glm::mat4(1.0f);
 		charModelMatrix = glm::translate(charModelMatrix, glm::vec3(xPos, yPos, 0.0f));
 		charModelMatrix = glm::scale(charModelMatrix, glm::vec3(textScale, textScale, 1.0f));
@@ -200,7 +208,7 @@ Font LoadFont(const char* fontFileDir, float pixelSize)
 	}
 
 	std::cout << "ERROR: TextRenderer was not initialized!" << std::endl;
-	return -1;
+	return Font(-1, 0.0f);
 }
 
 void RenderText(Font font, const std::string& text, const glm::vec2& position, float textScale, const glm::vec3& textColor)
