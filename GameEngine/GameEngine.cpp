@@ -16,6 +16,8 @@
 #include "CColliderCircle.h"
 #include "CColliderRect.h"
 #include "TextRenderer.h"
+#include "AL/al.h"
+#include "AL/alc.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -121,6 +123,21 @@ int main(void)
 
     float speed = 200.0f;
 
+    ALCdevice* device = alcOpenDevice(NULL);
+    if (!device) 
+    {
+        return -1;
+    }
+
+    ALCcontext* context = alcCreateContext(device, NULL);
+    if(!context)
+    {
+        alcCloseDevice(device);
+        return -1;
+    }
+
+    alcMakeContextCurrent(context);
+
     while (!glfwWindowShouldClose(window))
     {
         //Get Delta Time
@@ -168,6 +185,8 @@ int main(void)
         glfwPollEvents();
     }
 
+    alcDestroyContext(context);
+    alcCloseDevice(device);
     glfwTerminate();
     return 0;
 }
