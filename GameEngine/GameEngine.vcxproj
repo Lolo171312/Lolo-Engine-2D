@@ -130,6 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioBuffer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CCollider.cpp" />
     <ClCompile Include="CColliderCircle.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="CTextureRenderer.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="LComponent.cpp" />
     <ClCompile Include="LObject.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -145,12 +147,14 @@
     <ClCompile Include="TextRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioBuffer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CCollider.h" />
     <ClInclude Include="CColliderCircle.h" />
     <ClInclude Include="CColliderRect.h" />
     <ClInclude Include="ColliderManager.h" />
     <ClInclude Include="CTextureRenderer.h" />
+    <ClInclude Include="Helpers.h" />
     <ClInclude Include="LComponent.h" />
     <ClInclude Include="LObject.h" />
     <ClInclude Include="Shader.h" />

@@ -18,6 +18,7 @@
 #include "TextRenderer.h"
 #include "AL/al.h"
 #include "AL/alc.h"
+#include "AudioBuffer.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -138,6 +139,24 @@ int main(void)
 
     alcMakeContextCurrent(context);
 
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_ORIENTATION, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+
+    AudioBuffer* rockBuffer = AudioBuffer::Load("../Content/Sounds/RockIntro.wav");
+    AudioBuffer* loopBuffer = AudioBuffer::Load("../Content/Sounds/Loop.wav");
+
+    unsigned int mySource;
+    alGenSources(1, &mySource);
+    alSourcei(mySource, AL_BUFFER, rockBuffer->GetBufferId());
+    alSourcei(mySource, AL_LOOPING, 0);
+    alSourcef(mySource, AL_PITCH, 1.0f);
+    alSourcef(mySource, AL_GAIN, 1.0f);
+    alSource3f(mySource, AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alSource3f(mySource, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+
+    alSourcePlay(mySource);
+
     while (!glfwWindowShouldClose(window))
     {
         //Get Delta Time
@@ -187,6 +206,8 @@ int main(void)
 
     alcDestroyContext(context);
     alcCloseDevice(device);
+    alDeleteSources(1, &mySource);
+
     glfwTerminate();
     return 0;
 }
