@@ -19,6 +19,7 @@
 #include "AL/al.h"
 #include "AL/alc.h"
 #include "AudioBuffer.h"
+#include "CAudioSource.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -44,7 +45,7 @@ void ProcessInput(GLFWwindow* window)
 int main(void)
 {
     //Initialize GLFW
-    if (!glfwInit()) 
+    if (!glfwInit())
     {
         glfwTerminate();
         return -1;
@@ -59,7 +60,7 @@ int main(void)
 
     //Create a GLFW window
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Lolo Engine 2D", NULL, NULL);
-    if (window == nullptr) 
+    if (window == nullptr)
     {
         glfwTerminate();
         return -1;
@@ -82,6 +83,28 @@ int main(void)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+    //Initialize OpenAl and open default Device
+    ALCdevice* device = alcOpenDevice(NULL);
+    if (!device)
+    {
+        return -1;
+    }
+
+    //Create OpenAl Context
+    ALCcontext* context = alcCreateContext(device, NULL);
+    if (!context)
+    {
+        alcCloseDevice(device);
+        return -1;
+    }
+    //Make the created Context the current Context
+    alcMakeContextCurrent(context);
+
+    //Modify some general values of the Listener
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_ORIENTATION, 0.0f, 0.0f, 0.0f);
+    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+
     Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
     myShader.UseShader();
     float horizontalCoord = (float)WINDOW_WIDTH;
@@ -95,8 +118,10 @@ int main(void)
     myObject->SetObjectLocation(glm::vec2(280.0f, 300.0f));
     CTextureRenderer* TextureRenderer = new CTextureRenderer("../Content/bee.png");
     CColliderCircle* Collider = new CColliderCircle(46.0f);
+    CAudioSource* AudioSource = new CAudioSource();
     myObject->AttachComponent(TextureRenderer);
     myObject->AttachComponent(Collider);
+    myObject->AttachComponent(AudioSource);
 
     LObject* myOtherObject = new LObject(&myShader);
     myOtherObject->SetObjectLocation(glm::vec2(150.0f, 300.0f));
@@ -113,7 +138,7 @@ int main(void)
     ballObject->AttachComponent(BallCollider);
 
     //Initialize TextRenderer
-    if(InitTextRenderer(horizontalCoord, verticalCoord) == -1)
+    if (InitTextRenderer(horizontalCoord, verticalCoord) == -1)
     {
         std::cout << "Failed to initialize TextRenderer" << std::endl;
         return -1;
@@ -124,38 +149,10 @@ int main(void)
 
     float speed = 200.0f;
 
-    ALCdevice* device = alcOpenDevice(NULL);
-    if (!device) 
-    {
-        return -1;
-    }
-
-    ALCcontext* context = alcCreateContext(device, NULL);
-    if(!context)
-    {
-        alcCloseDevice(device);
-        return -1;
-    }
-
-    alcMakeContextCurrent(context);
-
-    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-    alListener3f(AL_ORIENTATION, 0.0f, 0.0f, 0.0f);
-    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-
     AudioBuffer* rockBuffer = AudioBuffer::Load("../Content/Sounds/RockIntro.wav");
     AudioBuffer* loopBuffer = AudioBuffer::Load("../Content/Sounds/Loop.wav");
 
-    unsigned int mySource;
-    alGenSources(1, &mySource);
-    alSourcei(mySource, AL_BUFFER, rockBuffer->GetBufferId());
-    alSourcei(mySource, AL_LOOPING, 0);
-    alSourcef(mySource, AL_PITCH, 1.0f);
-    alSourcef(mySource, AL_GAIN, 1.0f);
-    alSource3f(mySource, AL_POSITION, 0.0f, 0.0f, 0.0f);
-    alSource3f(mySource, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-
-    alSourcePlay(mySource);
+    AudioSource->SetAudioClip(loopBuffer);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -166,7 +163,7 @@ int main(void)
 
         //Input
         ProcessInput(window);
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) 
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
             myObject->AddObjectLocation(glm::vec2(1.0f, 0.0f) * speed * deltaTime);
         }
@@ -206,7 +203,6 @@ int main(void)
 
     alcDestroyContext(context);
     alcCloseDevice(device);
-    alDeleteSources(1, &mySource);
 
     glfwTerminate();
     return 0;

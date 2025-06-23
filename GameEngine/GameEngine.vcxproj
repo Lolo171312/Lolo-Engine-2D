@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="AudioBuffer.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CAudioSource.cpp" />
     <ClCompile Include="CCollider.cpp" />
     <ClCompile Include="CColliderCircle.cpp" />
     <ClCompile Include="CColliderRect.cpp" />
@@ -149,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="AudioBuffer.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CAudioSource.h" />
     <ClInclude Include="CCollider.h" />
     <ClInclude Include="CColliderCircle.h" />
     <ClInclude Include="CColliderRect.h" />

@@ -2,6 +2,7 @@
 
 #include "glm/glm/glm.hpp"
 #include <vector>
+#include <type_traits>
 
 class Shader;
 class LComponent;
@@ -39,6 +40,8 @@ public:
 
 	void AttachComponent(LComponent* newComponent);
 	void UpdateComponents(float deltaTime);
+	template<class T>
+	T* GetComponent();
 
 	virtual void Update(float deltaTime);
 
@@ -78,3 +81,17 @@ private:
 	/*Vector of components owned by the object*/
 	std::vector<LComponent*> _components;
 };
+
+template<class T>
+T* LObject::GetComponent()
+{
+	for (std::vector<LComponent*>::iterator itr = _components.begin(); itr != _components.end(); ++itr)
+	{
+		if(T* castedComponent = dynamic_cast<T*>(*itr))
+		{
+			return castedComponent;
+		}
+	}
+
+	return nullptr;
+}
