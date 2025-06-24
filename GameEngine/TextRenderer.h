@@ -12,6 +12,8 @@ class Shader;
 struct Character
 {
 	unsigned int vao;
+	unsigned int vbo;
+	unsigned int ebo;
 	unsigned int textureId;
 	glm::vec2 bearing;
 	glm::vec2 size;
@@ -49,6 +51,7 @@ private:
 * User Access Functions
 */
 int InitTextRenderer(float windowWidth, float windowHeight);
+void DestroyTextRenderer();
 Font LoadFont(const char* fontFileDir, float pixelSize);
 void RenderText(Font font, const std::string& text, const glm::vec2& position, float textScale = 1.0f, const glm::vec3& textColor = glm::vec3(1.0f));
 void RenderText(const std::string& text, const glm::vec2& position, float textScale = 1.0f, const glm::vec3& textColor = glm::vec3(1.0f));

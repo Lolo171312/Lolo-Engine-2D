@@ -16,3 +16,12 @@ ColliderManager* ColliderManager::GetInstance()
 
 	return _instance;
 }
+
+void ColliderManager::Destroy()
+{
+	ColliderManager* ptr = ColliderManager::GetInstance();
+	if(ptr)
+	{
+		delete ptr;
+	}
+}

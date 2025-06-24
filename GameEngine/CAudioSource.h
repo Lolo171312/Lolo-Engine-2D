@@ -6,7 +6,7 @@ class CAudioSource : public LComponent
 {
 public:
 	CAudioSource();
-	~CAudioSource();
+	virtual ~CAudioSource() override;
 
 	virtual void Update(float deltaTime){}
 

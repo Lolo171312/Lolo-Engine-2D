@@ -10,7 +10,19 @@
 
 TextRenderer::~TextRenderer()
 {
+	//Delete the previously created shader
 	delete _shaderPtr;
+
+	//Destroy every VAO and VBO of the characters of every loaded Font
+	for (std::vector< std::map<char, Character>>::iterator itr = _fonts.begin(); itr != _fonts.end(); ++itr)
+	{
+		for (std::map<char, Character>::iterator mapItr = (*itr).begin(); mapItr != (*itr).end(); ++mapItr)
+		{
+			glDeleteVertexArrays(1, &(*mapItr).second.vao);
+			glDeleteBuffers(1, &(*mapItr).second.vbo);
+			glDeleteBuffers(1, &(*mapItr).second.ebo);
+		}
+	}
 }
 
 void TextRenderer::InitializeTextRenderer(const glm::vec2& windowSize)
@@ -115,6 +127,8 @@ Font TextRenderer::LoadFontTR(const char* fontFileDir, float pixelSize)
 		//Create Character struct and fill it with the current char´s data
 		Character newCharacter{
 			VAO,
+			VBO,
+			EBO,
 			characterTexture,
 			glm::vec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 			glm::vec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
@@ -197,6 +211,15 @@ int InitTextRenderer(float windowWidth, float windowHeight)
 	}
 
 	return -1;
+}
+
+void DestroyTextRenderer()
+{
+	TextRenderer* instancePtr = TextRenderer::GetInstance();
+	if (instancePtr) 
+	{
+		delete instancePtr;
+	}
 }
 
 Font LoadFont(const char* fontFileDir, float pixelSize)

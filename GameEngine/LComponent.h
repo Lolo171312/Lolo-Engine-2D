@@ -5,6 +5,9 @@ class LObject;
 class LComponent
 {
 public:
+	virtual ~LComponent()
+	{}
+
 	/*Component Functions*/
 	/*
 	* This function is called when the Component is attached to an LObject

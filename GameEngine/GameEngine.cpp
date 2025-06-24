@@ -21,6 +21,7 @@
 #include "AudioBuffer.h"
 #include "CAudioSource.h"
 #include "ObjectsManager.h"
+#include "ColliderManager.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -109,6 +110,7 @@ int main(void)
     //Initialize Objects Manager
     ObjectsManager::Init();
 
+#pragma region CreateShaderAndObjects
     Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
     myShader.UseShader();
     float horizontalCoord = (float)WINDOW_WIDTH;
@@ -140,6 +142,7 @@ int main(void)
     CColliderCircle* BallCollider = new CColliderCircle(50.0f);
     ballObject->AttachComponent(BallTextureRenderer);
     ballObject->AttachComponent(BallCollider);
+#pragma endregion CreateShaderAndObjects
 
     //Initialize TextRenderer
     if (InitTextRenderer(horizontalCoord, verticalCoord) == -1)
@@ -148,11 +151,13 @@ int main(void)
         return -1;
     }
 
+    //Load some fonts
     Font basisFont = LoadFont("../Content/Fonts/Dotrice.otf", 45.0f);
     Font monospacedFont = LoadFont("../Content/Fonts/Monospace.ttf", 55.0f);
 
     float speed = 200.0f;
 
+    //Load some clips
     AudioBuffer* rockBuffer = AudioBuffer::Load("../Content/Sounds/RockIntro.wav");
     AudioBuffer* loopBuffer = AudioBuffer::Load("../Content/Sounds/Loop.wav");
 
@@ -214,10 +219,21 @@ int main(void)
         glfwPollEvents();
     }
 
+    //Delete clips
+    delete rockBuffer;
+    delete loopBuffer;
+
+    //Terminate OpenAl related elements
     alcDestroyContext(context);
     alcCloseDevice(device);
+    //Terminate ObjectsManager
     ObjectsManager::GetInstance()->DestroyManager();
+    //Terminate Collider Manager
+    ColliderManager::Destroy();
+    //Terminate GLFW related elements
     glfwTerminate();
+    //Terminate Text Renderer
+    DestroyTextRenderer();
 
     return 0;
 }

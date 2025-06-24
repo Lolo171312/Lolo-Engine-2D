@@ -11,6 +11,7 @@ public:
 	inline void AddColliderCmp(CCollider* newColliderCmp) { _colliderCmps.push_back(newColliderCmp); }
 
 	static ColliderManager* GetInstance();
+	static void Destroy();
 
 	inline const std::vector<CCollider*>& GetColliderCmps() { return _colliderCmps; }
 

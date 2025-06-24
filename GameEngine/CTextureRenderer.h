@@ -5,7 +5,7 @@ class CTextureRenderer : public LComponent
 {
 public:
 	CTextureRenderer(const char* textureFileDir);
-	~CTextureRenderer();
+	virtual ~CTextureRenderer() override;
 	virtual void Update(float deltaTime);
 
 private:
@@ -19,5 +19,7 @@ private:
 
 	/*Mesh Variables*/
 	unsigned int _VAO;
+	unsigned int _VBO;
+	unsigned int _EBO;
 };
 

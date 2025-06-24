@@ -15,6 +15,10 @@ CTextureRenderer::~CTextureRenderer()
 {
 	//Delete object´s texture before the object gets destroyed
 	glDeleteTextures(1, &_textureId);
+	//Delete Vertex Array and Buffers
+	glDeleteBuffers(1, &_VBO);
+	glDeleteBuffers(1, &_EBO);
+	glDeleteVertexArrays(1, &_VAO);
 }
 
 void CTextureRenderer::Update(float deltaTime)
@@ -96,17 +100,16 @@ void CTextureRenderer::GenerateMesh(const int* width, const int* height)
 		3, 0, 2
 	};
 
-	//Create and set data for VAO, VBO and EBO
-	unsigned int VBO, EBO;
+	//Set data for VAO, VBO and EBO
 	glGenVertexArrays(1, &_VAO);
 	glBindVertexArray(_VAO);
 
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glGenBuffers(1, &_VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, _VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glGenBuffers(1, &_EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 4, (void*)0);
