@@ -20,6 +20,7 @@
 #include "AL/alc.h"
 #include "AudioBuffer.h"
 #include "CAudioSource.h"
+#include "ObjectsManager.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -105,6 +106,9 @@ int main(void)
     alListener3f(AL_ORIENTATION, 0.0f, 0.0f, 0.0f);
     alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
 
+    //Initialize Objects Manager
+    ObjectsManager::Init();
+
     Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
     myShader.UseShader();
     float horizontalCoord = (float)WINDOW_WIDTH;
@@ -154,6 +158,8 @@ int main(void)
 
     AudioSource->SetAudioClip(loopBuffer);
 
+    bool destroyObject = false;
+
     while (!glfwWindowShouldClose(window))
     {
         //Get Delta Time
@@ -180,13 +186,20 @@ int main(void)
             myObject->AddObjectLocation(glm::vec2(0.0f, 1.0f) * speed * deltaTime);
         }
 
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) 
+        {
+            if(!destroyObject)
+            {
+                destroyObject = true;
+                ObjectsManager::GetInstance()->DestroyObject(ballObject);
+            }
+        }
+
         //Rendering
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        myOtherObject->Update(deltaTime);
-        myObject->Update(deltaTime);
-        ballObject->Update(deltaTime);
+        ObjectsManager::GetInstance()->Update(deltaTime);
 
         float scaleVal = sinf(glfwGetTime());
         scaleVal = glm::clamp(scaleVal, 0.1f, 1.0f);
@@ -203,7 +216,8 @@ int main(void)
 
     alcDestroyContext(context);
     alcCloseDevice(device);
-
+    ObjectsManager::GetInstance()->DestroyManager();
     glfwTerminate();
+
     return 0;
 }

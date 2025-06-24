@@ -34,8 +34,7 @@ public:
 	/*
 	* Constructor and Destructor
 	*/
-	LObject(Shader* shaderPtr, const Transform& initialTransform = Transform()) : _transform(initialTransform), _objectShader(shaderPtr)
-	{}
+	LObject(Shader* shaderPtr, const Transform& initialTransform = Transform());
 	~LObject();
 
 	void AttachComponent(LComponent* newComponent);

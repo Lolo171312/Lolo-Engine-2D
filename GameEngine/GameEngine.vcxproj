@@ -143,6 +143,7 @@
     <ClCompile Include="Helpers.cpp" />
     <ClCompile Include="LComponent.cpp" />
     <ClCompile Include="LObject.cpp" />
+    <ClCompile Include="ObjectsManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SingletonBase.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="Helpers.h" />
     <ClInclude Include="LComponent.h" />
     <ClInclude Include="LObject.h" />
+    <ClInclude Include="ObjectsManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SingletonBase.h" />
     <ClInclude Include="TextRenderer.h" />

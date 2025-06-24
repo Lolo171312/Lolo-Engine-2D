@@ -8,6 +8,13 @@
 #include "glm/glm/gtc/type_ptr.hpp"
 #include "LComponent.h"
 #include "CCollider.h"
+#include "ObjectsManager.h"
+
+LObject::LObject(Shader* shaderPtr, const Transform& initialTransform) : _transform(initialTransform), _objectShader(shaderPtr)
+{
+	//Adds the current object to the ObjectsManager
+	ObjectsManager::GetInstance()->AddObject(this);
+}
 
 LObject::~LObject()
 {
@@ -16,6 +23,8 @@ LObject::~LObject()
 	{
 		delete (*itr);
 	}
+
+	_components.clear();
 }
 
 void LObject::AttachComponent(LComponent* newComponent)
