@@ -1,6 +1,9 @@
 #pragma once
 
 #include "LComponent.h"
+
+struct TextureType;
+
 class CTextureRenderer : public LComponent
 {
 public:
@@ -21,5 +24,7 @@ private:
 	unsigned int _VAO;
 	unsigned int _VBO;
 	unsigned int _EBO;
+
+	TextureType* _texture;
 };
 

@@ -22,6 +22,7 @@
 #include "CAudioSource.h"
 #include "ObjectsManager.h"
 #include "ColliderManager.h"
+#include "Flyweight/TextureFactory.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -110,6 +111,9 @@ int main(void)
     //Initialize Objects Manager
     ObjectsManager::Init();
 
+    //Initialize Texture Factory (FlyweightPatron)
+    TextureFactory::Init();
+
 #pragma region CreateShaderAndObjects
     Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
     myShader.UseShader();
@@ -123,25 +127,32 @@ int main(void)
     LObject* myObject = new LObject(&myShader);
     myObject->SetObjectLocation(glm::vec2(280.0f, 300.0f));
     CTextureRenderer* TextureRenderer = new CTextureRenderer("../Content/bee.png");
-    CColliderCircle* Collider = new CColliderCircle(46.0f);
-    CAudioSource* AudioSource = new CAudioSource();
     myObject->AttachComponent(TextureRenderer);
-    myObject->AttachComponent(Collider);
-    myObject->AttachComponent(AudioSource);
 
-    LObject* myOtherObject = new LObject(&myShader);
-    myOtherObject->SetObjectLocation(glm::vec2(150.0f, 300.0f));
-    CTextureRenderer* OtherTextureRenderer = new CTextureRenderer("../Content/box.png");
-    CColliderRect* OtherCollider = new CColliderRect(100.0f, 100.0f);
-    myOtherObject->AttachComponent(OtherTextureRenderer);
-    myOtherObject->AttachComponent(OtherCollider);
+    LObject* myObject2 = new LObject(&myShader);
+    myObject2->SetObjectLocation(glm::vec2(180.0f, 300.0f));
+    CTextureRenderer* TextureRenderer2 = new CTextureRenderer("../Content/bee.png");
+    myObject2->AttachComponent(TextureRenderer2);
 
-    LObject* ballObject = new LObject(&myShader);
-    ballObject->SetObjectLocation(glm::vec2(500.0f, 300.0f));
-    CTextureRenderer* BallTextureRenderer = new CTextureRenderer("../Content/ball.png");
-    CColliderCircle* BallCollider = new CColliderCircle(50.0f);
-    ballObject->AttachComponent(BallTextureRenderer);
-    ballObject->AttachComponent(BallCollider);
+    LObject* myObject3 = new LObject(&myShader);
+    myObject3->SetObjectLocation(glm::vec2(380.0f, 300.0f));
+    CTextureRenderer* TextureRenderer3 = new CTextureRenderer("../Content/bee.png");
+    myObject3->AttachComponent(TextureRenderer3);
+
+    LObject* myObject4 = new LObject(&myShader);
+    myObject4->SetObjectLocation(glm::vec2(280.0f, 500.0f));
+    CTextureRenderer* TextureRenderer4 = new CTextureRenderer("../Content/bee.png");
+    myObject4->AttachComponent(TextureRenderer4);
+
+    LObject* myObject5 = new LObject(&myShader);
+    myObject5->SetObjectLocation(glm::vec2(180.0f, 500.0f));
+    CTextureRenderer* TextureRenderer5 = new CTextureRenderer("../Content/bee.png");
+    myObject5->AttachComponent(TextureRenderer5);
+
+    LObject* myObject6 = new LObject(&myShader);
+    myObject6->SetObjectLocation(glm::vec2(380.0f, 500.0f));
+    CTextureRenderer* TextureRenderer6 = new CTextureRenderer("../Content/bee.png");
+    myObject6->AttachComponent(TextureRenderer6);
 #pragma endregion CreateShaderAndObjects
 
     //Initialize TextRenderer
@@ -161,8 +172,6 @@ int main(void)
     AudioBuffer* rockBuffer = AudioBuffer::Load("../Content/Sounds/RockIntro.wav");
     AudioBuffer* loopBuffer = AudioBuffer::Load("../Content/Sounds/Loop.wav");
 
-    AudioSource->SetAudioClip(loopBuffer);
-
     bool destroyObject = false;
 
     while (!glfwWindowShouldClose(window))
@@ -174,31 +183,6 @@ int main(void)
 
         //Input
         ProcessInput(window);
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        {
-            myObject->AddObjectLocation(glm::vec2(1.0f, 0.0f) * speed * deltaTime);
-        }
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        {
-            myObject->AddObjectLocation(glm::vec2(-1.0f, 0.0f) * speed * deltaTime);
-        }
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        {
-            myObject->AddObjectLocation(glm::vec2(0.0f, -1.0f) * speed * deltaTime);
-        }
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        {
-            myObject->AddObjectLocation(glm::vec2(0.0f, 1.0f) * speed * deltaTime);
-        }
-
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) 
-        {
-            if(!destroyObject)
-            {
-                destroyObject = true;
-                ObjectsManager::GetInstance()->DestroyObject(ballObject);
-            }
-        }
 
         //Rendering
         glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
@@ -214,6 +198,10 @@ int main(void)
         RenderText(basisFont, "Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
         RenderText("Using default Font :o", glm::vec2(250.0f, 145.0f), 1.00f, glm::vec3(1.0f, 1.0f, 0.0f));
 
+        float scale = sinf(glfwGetTime());
+        myObject->SetObjectScale(glm::vec2(scale, scale));
+        myObject5->SetObjectAngle(scale * 20.0f);
+
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -228,6 +216,8 @@ int main(void)
     alcCloseDevice(device);
     //Terminate ObjectsManager
     ObjectsManager::GetInstance()->DestroyManager();
+    //Terminate Texture Factory
+    TextureFactory::GetInstance()->DestroyFactory();
     //Terminate Collider Manager
     ColliderManager::Destroy();
     //Terminate GLFW related elements

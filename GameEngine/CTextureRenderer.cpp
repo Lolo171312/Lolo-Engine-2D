@@ -3,40 +3,50 @@
 #include "STBImage/stb_image.h"
 #include <iostream>
 #include "LObject.h"
+#include "Flyweight/TextureFactory.h"
 
 CTextureRenderer::CTextureRenderer(const char* textureFileDir)
 {
 	//Get texture data
 	LoadTexture(textureFileDir, &_textureWidth, &_textureHeight);
-	GenerateMesh(&_textureWidth, &_textureHeight);
+	//GenerateMesh(&_textureWidth, &_textureHeight);
 }
 
 CTextureRenderer::~CTextureRenderer()
 {
+	/*
 	//Delete object´s texture before the object gets destroyed
 	glDeleteTextures(1, &_textureId);
 	//Delete Vertex Array and Buffers
 	glDeleteBuffers(1, &_VBO);
 	glDeleteBuffers(1, &_EBO);
 	glDeleteVertexArrays(1, &_VAO);
+	*/
 }
 
 void CTextureRenderer::Update(float deltaTime)
 {
+	if (_texture == nullptr) return;
+
 	//Enable blend and object´s texture
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _textureId);
+	glBindTexture(GL_TEXTURE_2D, _texture->textureId);
 
 	//Draw mesh
-	glBindVertexArray(_VAO);
+	glBindVertexArray(_texture->VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
 void CTextureRenderer::LoadTexture(const char* texDir, int* width, int* height)
 {
+	if (TextureFactory* factory = TextureFactory::GetInstance())
+	{
+		_texture = factory->GetType(texDir);
+	}
+	/*
 	//Generate Texture
 	glGenTextures(1, &_textureId);
 
@@ -79,18 +89,28 @@ void CTextureRenderer::LoadTexture(const char* texDir, int* width, int* height)
 	}
 
 	//Once the data has been set, free the loaded image
-	stbi_image_free(textureData);
+	stbi_image_free(textureData);*/
 }
 
 void CTextureRenderer::GenerateMesh(const int* width, const int* height)
 {
+	if (_texture == nullptr) return;
+
 	//Generate vertex positions (pixel size) according to the texture
-	float vertexData[16]
+	/*float vertexData[16]
 	{
 		-(float)*width / 2.0f, (float)*height / 2.0f, 0.0f, 1.0f,
 		(float)*width / 2.0f, (float)*height / 2.0f, 1.0f, 1.0f,
 		(float)*width / 2.0f, -(float)*height / 2.0f, 1.0f, 0.0f,
 		-(float)*width / 2.0f, -(float)*height / 2.0f, 0.0f, 0.0f
+	};*/
+
+	float vertexData[16]
+	{
+		-(float)_texture->width / 2.0f, (float)_texture->height / 2.0f, 0.0f, 1.0f,
+		(float)_texture->width / 2.0f, (float)_texture->height / 2.0f, 1.0f, 1.0f,
+		(float)_texture->width / 2.0f, -(float)_texture->height / 2.0f, 1.0f, 0.0f,
+		-(float)_texture->width / 2.0f, -(float)_texture->height / 2.0f, 0.0f, 0.0f
 	};
 
 	//Generate indices to create EBO later
