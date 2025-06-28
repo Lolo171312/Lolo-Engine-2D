@@ -130,7 +130,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AudioBuffer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CAudioSource.cpp" />
     <ClCompile Include="CCollider.cpp" />
@@ -138,6 +137,7 @@
     <ClCompile Include="CColliderRect.cpp" />
     <ClCompile Include="ColliderManager.cpp" />
     <ClCompile Include="CTextureRenderer.cpp" />
+    <ClCompile Include="Flyweight\AudioClipFactory.cpp" />
     <ClCompile Include="Flyweight\BaseFactory.cpp" />
     <ClCompile Include="Flyweight\TextureFactory.cpp" />
     <ClCompile Include="GameEngine.cpp" />
@@ -148,10 +148,10 @@
     <ClCompile Include="ObjectsManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SingletonBase.cpp" />
+    <ClCompile Include="Sound.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AudioBuffer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CAudioSource.h" />
     <ClInclude Include="CCollider.h" />
@@ -159,6 +159,7 @@
     <ClInclude Include="CColliderRect.h" />
     <ClInclude Include="ColliderManager.h" />
     <ClInclude Include="CTextureRenderer.h" />
+    <ClInclude Include="Flyweight\AudioClipFactory.h" />
     <ClInclude Include="Flyweight\BaseFactory.h" />
     <ClInclude Include="Flyweight\TextureFactory.h" />
     <ClInclude Include="Helpers.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="ObjectsManager.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="SingletonBase.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="TextRenderer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

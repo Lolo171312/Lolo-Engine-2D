@@ -1,7 +1,7 @@
 #pragma once
 #include "LComponent.h"
 
-class AudioBuffer;
+struct AudioClipType;
 class CAudioSource : public LComponent
 {
 public:
@@ -10,7 +10,7 @@ public:
 
 	virtual void Update(float deltaTime){}
 
-	void SetAudioClip(AudioBuffer* newClip) const;
+	void SetAudioClip(AudioClipType* newClip) const;
 	void Play() const;
 	void Pause() const;
 	void Stop() const;

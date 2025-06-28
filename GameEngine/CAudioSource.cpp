@@ -1,7 +1,7 @@
 #include "CAudioSource.h"
 #include "AL/al.h"
 #include "AL/alc.h"
-#include "AudioBuffer.h"
+#include "Flyweight/AudioClipFactory.h"
 
 CAudioSource::CAudioSource()
 {
@@ -30,11 +30,11 @@ CAudioSource::~CAudioSource()
     alDeleteSources(1, &_sourceId);
 }
 
-void CAudioSource::SetAudioClip(AudioBuffer* newClip) const
+void CAudioSource::SetAudioClip(AudioClipType* newClip) const
 {
     if (!newClip) return;
 
-    alSourcei(_sourceId, AL_BUFFER, newClip->GetBufferId());
+    alSourcei(_sourceId, AL_BUFFER, newClip->_bufferId);
 }
 
 void CAudioSource::Play() const

@@ -23,5 +23,9 @@ inline T* SingletonBase<T>::Init()
 template<class T>
 inline T* SingletonBase<T>::GetInstance()
 {
+	if(_instance == nullptr)
+	{
+		Init();
+	}
 	return _instance;
 }

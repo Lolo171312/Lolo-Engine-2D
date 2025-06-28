@@ -18,11 +18,11 @@
 #include "TextRenderer.h"
 #include "AL/al.h"
 #include "AL/alc.h"
-#include "AudioBuffer.h"
 #include "CAudioSource.h"
 #include "ObjectsManager.h"
 #include "ColliderManager.h"
 #include "Flyweight/TextureFactory.h"
+#include "Sound.h"
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
@@ -86,33 +86,16 @@ int main(void)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-    //Initialize OpenAl and open default Device
-    ALCdevice* device = alcOpenDevice(NULL);
-    if (!device)
+
+    //Initialize TextRenderer
+    if (InitSound() == -1)
     {
+        std::cout << "Failed to initialize Sound" << std::endl;
         return -1;
     }
-
-    //Create OpenAl Context
-    ALCcontext* context = alcCreateContext(device, NULL);
-    if (!context)
-    {
-        alcCloseDevice(device);
-        return -1;
-    }
-    //Make the created Context the current Context
-    alcMakeContextCurrent(context);
-
-    //Modify some general values of the Listener
-    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-    alListener3f(AL_ORIENTATION, 0.0f, 0.0f, 0.0f);
-    alListener3f(AL_VELOCITY, 0.0f, 0.0f, 0.0f);
 
     //Initialize Objects Manager
     ObjectsManager::Init();
-
-    //Initialize Texture Factory (FlyweightPatron)
-    TextureFactory::Init();
 
 #pragma region CreateShaderAndObjects
     Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
@@ -166,12 +149,6 @@ int main(void)
     Font basisFont = LoadFont("../Content/Fonts/Dotrice.otf", 45.0f);
     Font monospacedFont = LoadFont("../Content/Fonts/Monospace.ttf", 55.0f);
 
-    float speed = 200.0f;
-
-    //Load some clips
-    AudioBuffer* rockBuffer = AudioBuffer::Load("../Content/Sounds/RockIntro.wav");
-    AudioBuffer* loopBuffer = AudioBuffer::Load("../Content/Sounds/Loop.wav");
-
     bool destroyObject = false;
 
     while (!glfwWindowShouldClose(window))
@@ -207,13 +184,8 @@ int main(void)
         glfwPollEvents();
     }
 
-    //Delete clips
-    delete rockBuffer;
-    delete loopBuffer;
-
     //Terminate OpenAl related elements
-    alcDestroyContext(context);
-    alcCloseDevice(device);
+    TerminateSound();
     //Terminate ObjectsManager
     ObjectsManager::GetInstance()->DestroyManager();
     //Terminate Texture Factory
