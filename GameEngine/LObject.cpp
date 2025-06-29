@@ -10,7 +10,7 @@
 #include "CCollider.h"
 #include "ObjectsManager.h"
 
-LObject::LObject(Shader* shaderPtr, const std::string& tag, const Transform& initialTransform) : _transform(initialTransform), _tag(tag), _objectShader(shaderPtr)
+LObject::LObject(Shader* shaderPtr, const std::string& tag, GLFWwindow* window, const Transform& initialTransform) : _transform(initialTransform), _tag(tag), _objectShader(shaderPtr), _window(window)
 {
 	//Adds the current object to the ObjectsManager
 	ObjectsManager::GetInstance()->AddObject(this);
@@ -51,6 +51,9 @@ void LObject::UpdateComponents(float deltaTime)
 
 void LObject::Update(float deltaTime)
 {
+	//Process Input for the Object
+	Input(deltaTime);
+
 	//Enable shader if there is one
 	if (_objectShader != nullptr)
 	{
@@ -58,7 +61,13 @@ void LObject::Update(float deltaTime)
 		SetShaderModelMatrix();
 	}
 
+	//Update every component attached in the Object
 	UpdateComponents(deltaTime);
+}
+
+void LObject::Input(float deltaTime)
+{
+	if (_window == nullptr) return;
 }
 
 void LObject::OnCollisionEnter(CCollider* other)

@@ -2,7 +2,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-void Paddle::Update(float deltaTime)
+void Paddle::Input(float deltaTime)
 {
-	LObject::Update(deltaTime);
+	LObject::Input(deltaTime);
+
+	
 }

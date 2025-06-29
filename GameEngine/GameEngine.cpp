@@ -145,7 +145,7 @@ int main(void)
     }
 
     //Create Paddle object
-    Paddle* paddle = new Paddle(&myShader, "Paddle");
+    Paddle* paddle = new Paddle(&myShader, "Paddle", window);
     CTextureRenderer* paddleTextureCmp = new CTextureRenderer("../Content/paddle.png");
     paddle->AttachComponent(paddleTextureCmp);
     paddle->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 64));

@@ -5,10 +5,10 @@
 class Paddle : public LObject
 {
 public:
-	Paddle(Shader* shaderPtr, const std::string& tag, const Transform& initialTransform = Transform()) :
-		LObject(shaderPtr, tag, initialTransform)
+	Paddle(Shader* shaderPtr, const std::string& tag, GLFWwindow* window = nullptr, const Transform& initialTransform = Transform()) :
+		LObject(shaderPtr, tag, window, initialTransform)
 	{}
 
-	virtual void Update(float deltaTime) override;
+	virtual void Input(float deltaTime) override;
 };
 

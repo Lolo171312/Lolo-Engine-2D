@@ -4,7 +4,7 @@
 class Block : public LObject
 {
 public:
-	Block(Shader* shaderPtr, const std::string& tag, const Transform& initialTransform = Transform()) :
-		LObject(shaderPtr, tag, initialTransform)
+	Block(Shader* shaderPtr, const std::string& tag, GLFWwindow* window = nullptr, const Transform& initialTransform = Transform()) :
+		LObject(shaderPtr, tag, window, initialTransform)
 	{}
 };

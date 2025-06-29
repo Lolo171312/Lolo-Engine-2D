@@ -8,6 +8,7 @@
 class Shader;
 class LComponent;
 class CCollider;
+struct GLFWwindow;
 
 struct Transform 
 {
@@ -35,7 +36,7 @@ public:
 	/*
 	* Constructor and Destructor
 	*/
-	LObject(Shader* shaderPtr, const std::string& tag, const Transform& initialTransform = Transform());
+	LObject(Shader* shaderPtr, const std::string& tag, GLFWwindow* window = nullptr, const Transform& initialTransform = Transform());
 	~LObject();
 
 	void AttachComponent(LComponent* newComponent);
@@ -44,6 +45,7 @@ public:
 	T* GetComponent();
 
 	virtual void Update(float deltaTime);
+	virtual void Input(float deltaTime);
 
 	virtual void OnCollisionEnter(CCollider* other);
 
@@ -85,6 +87,12 @@ private:
 
 	/*Object tag*/
 	std::string _tag = "None";
+
+	/*
+	* Window variable
+	* If we don´t want Input for this LObject this variable can remain as nullptr
+	*/
+	GLFWwindow* _window;
 };
 
 template<class T>
