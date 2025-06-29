@@ -131,12 +131,12 @@ int main(void)
         for (unsigned int y = 0; y < verticalBlocks; ++y)
         {
             //Create block object with its tag
-            Block* block = new Block(&myShader, "Block");
+            Block* blockObj = new Block(&myShader, "Block");
             //Generate TextureRenderer Cmp with the brick texture and attach it to the object
             CTextureRenderer* blockTextureCmp = new CTextureRenderer("../Content/brick.png");
-            block->AttachComponent(blockTextureCmp);
+            blockObj->AttachComponent(blockTextureCmp);
             //Modify location
-            block->SetObjectLocation(glm::vec2(horizontalOffset + x * 64, verticalOffset + y * 32));
+            blockObj->SetObjectLocation(glm::vec2(horizontalOffset + x * 64, verticalOffset + y * 32));
             //Define block´s color using the y value
             if(y < 2) blockTextureCmp->SetColor(glm::vec3(1.0f, 0.0f, 0.0f)); //Red
             else if(y < 4) blockTextureCmp->SetColor(glm::vec3(0.0f, 1.0f, 0.0f)); //Green
@@ -145,10 +145,16 @@ int main(void)
     }
 
     //Create Paddle object
-    Paddle* paddle = new Paddle(&myShader, "Paddle", window);
+    Paddle* paddleObj = new Paddle(&myShader, "Paddle", window);
     CTextureRenderer* paddleTextureCmp = new CTextureRenderer("../Content/paddle.png");
-    paddle->AttachComponent(paddleTextureCmp);
-    paddle->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 64));
+    paddleObj->AttachComponent(paddleTextureCmp);
+    paddleObj->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 64));
+
+    //Create Ball object
+    LObject* ballObj = new LObject(&myShader, "Ball");
+    CTextureRenderer* ballTextureCmp = new CTextureRenderer("../Content/ball.png");
+    ballObj->AttachComponent(ballTextureCmp);
+    ballObj->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 90));
 
 #pragma endregion CreateShaderAndObjects
 
@@ -168,15 +174,6 @@ int main(void)
 
         //Update every Object in the game
         ObjectsManager::GetInstance()->Update(deltaTime);
-
-        if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        {
-            paddle->AddObjectLocation(glm::vec2(300.0f * deltaTime, 0.0f));
-        }
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        {
-            paddle->AddObjectLocation(glm::vec2(-300.0f * deltaTime, 0.0f));
-        }
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);

@@ -39,6 +39,9 @@ public:
 	LObject(Shader* shaderPtr, const std::string& tag, GLFWwindow* window = nullptr, const Transform& initialTransform = Transform());
 	~LObject();
 
+	/*
+	* Component Functions
+	*/
 	void AttachComponent(LComponent* newComponent);
 	void UpdateComponents(float deltaTime);
 	template<class T>
@@ -69,6 +72,14 @@ public:
 	inline const Transform& GetObjectTransform() const { return _transform; }
 
 	inline const Shader* GetShader() const { return _objectShader; }
+	inline const std::string& GetTag() const { return _tag; }
+
+protected:
+	/*
+	* Window variable
+	* If we don´t want Input for this LObject this variable can remain as nullptr
+	*/
+	GLFWwindow* _window;
 
 private:
 	/*
@@ -87,12 +98,6 @@ private:
 
 	/*Object tag*/
 	std::string _tag = "None";
-
-	/*
-	* Window variable
-	* If we don´t want Input for this LObject this variable can remain as nullptr
-	*/
-	GLFWwindow* _window;
 };
 
 template<class T>
