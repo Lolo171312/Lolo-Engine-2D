@@ -10,7 +10,7 @@
 #include "CCollider.h"
 #include "ObjectsManager.h"
 
-LObject::LObject(Shader* shaderPtr, const Transform& initialTransform) : _transform(initialTransform), _objectShader(shaderPtr)
+LObject::LObject(Shader* shaderPtr, const std::string& tag, const Transform& initialTransform) : _transform(initialTransform), _tag(tag), _objectShader(shaderPtr)
 {
 	//Adds the current object to the ObjectsManager
 	ObjectsManager::GetInstance()->AddObject(this);

@@ -4,11 +4,14 @@ layout (location = 1) in vec2 aTexCoords;
 
 uniform mat4 model;
 uniform mat4 projection;
+uniform vec3 color;
 
 out vec2 TexCoords;
+out vec3 Color;
 
 void main()
 {
-   gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);
-   TexCoords = aTexCoords;
+   	gl_Position = projection * model * vec4(aPos, -5.0f, 1.0f);
+   	TexCoords = aTexCoords;
+	Color = color;
 }

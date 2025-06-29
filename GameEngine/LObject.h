@@ -3,6 +3,7 @@
 #include "glm/glm/glm.hpp"
 #include <vector>
 #include <type_traits>
+#include <string>
 
 class Shader;
 class LComponent;
@@ -34,7 +35,7 @@ public:
 	/*
 	* Constructor and Destructor
 	*/
-	LObject(Shader* shaderPtr, const Transform& initialTransform = Transform());
+	LObject(Shader* shaderPtr, const std::string& tag, const Transform& initialTransform = Transform());
 	~LObject();
 
 	void AttachComponent(LComponent* newComponent);
@@ -65,6 +66,8 @@ public:
 	inline const glm::vec2& GetObjectScale() const { return _transform._scale; }
 	inline const Transform& GetObjectTransform() const { return _transform; }
 
+	inline const Shader* GetShader() const { return _objectShader; }
+
 private:
 	/*
 	* Modifies Shader´s model matrix before the update according to the _transform values
@@ -79,6 +82,9 @@ private:
 
 	/*Vector of components owned by the object*/
 	std::vector<LComponent*> _components;
+
+	/*Object tag*/
+	std::string _tag = "None";
 };
 
 template<class T>

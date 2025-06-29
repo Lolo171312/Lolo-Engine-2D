@@ -1,4 +1,5 @@
 #include "Helpers.h"
+#include <cstdlib>
 
 // Determina si el sistema es Big Endian
 bool IsSystemBigEndian()
@@ -30,4 +31,21 @@ int ConvertBytesToInt(const char* buffer, int byteCount)
         }
     }
     return result;
+}
+
+int RandomInt(int maxInteger)
+{
+    return rand() % (maxInteger + 1);
+}
+
+int RandomInt(int minInteger, int maxInteger)
+{
+    if(maxInteger < minInteger)
+    {
+        int helper = minInteger;
+        minInteger = maxInteger;
+        maxInteger = helper;
+    }
+    int diff = maxInteger - minInteger;
+    return (rand() % (diff + 1)) + minInteger;
 }

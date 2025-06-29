@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LComponent.h"
+#include "glm/glm/glm.hpp"
 
 struct TextureType;
 
@@ -8,23 +9,17 @@ class CTextureRenderer : public LComponent
 {
 public:
 	CTextureRenderer(const char* textureFileDir);
-	virtual ~CTextureRenderer() override;
 	virtual void Update(float deltaTime);
 
+	inline void SetColor(const glm::vec3& newColor) { _color = newColor; }
+	inline const glm::vec3& GetColor() const { return _color; }
+
 private:
-	void LoadTexture(const char* texDir, int* width, int* height);
-	void GenerateMesh(const int* width, const int* height);
+	void LoadTextureAndMesh(const char* texDir);
 
-	/*Texture Variables*/
-	unsigned int _textureId;
-	int _textureWidth;
-	int _textureHeight;
-
-	/*Mesh Variables*/
-	unsigned int _VAO;
-	unsigned int _VBO;
-	unsigned int _EBO;
+	void SetColorShader() const;
 
 	TextureType* _texture;
+	glm::vec3 _color;
 };
 

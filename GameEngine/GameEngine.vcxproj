@@ -130,6 +130,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Breakout\Block.cpp" />
+    <ClCompile Include="Breakout\Paddle.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CAudioSource.cpp" />
     <ClCompile Include="CCollider.cpp" />
@@ -152,6 +154,8 @@
     <ClCompile Include="TextRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Breakout\Block.h" />
+    <ClInclude Include="Breakout\Paddle.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CAudioSource.h" />
     <ClInclude Include="CCollider.h" />

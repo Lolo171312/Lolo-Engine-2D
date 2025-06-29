@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include "STBImage/stb_image.h"
 #include "glm/glm/glm.hpp"
 #include "glm/glm/gtc/matrix_transform.hpp"
@@ -23,9 +24,12 @@
 #include "ColliderManager.h"
 #include "Flyweight/TextureFactory.h"
 #include "Sound.h"
+#include "Breakout/Block.h"
+#include "Breakout/Paddle.h"
+#include "Helpers.h"
 
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
+const int WINDOW_WIDTH = 576;
+const int WINDOW_HEIGHT = 650;
 
 float deltaTime = 0.0f;
 float prevTime = 0.0f;
@@ -47,6 +51,8 @@ void ProcessInput(GLFWwindow* window)
 
 int main(void)
 {
+    srand(time(0));
+
     //Initialize GLFW
     if (!glfwInit())
     {
@@ -61,14 +67,13 @@ int main(void)
     //Tell GLFW we want to use a version of OpenGL with less option we won´t need
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    //Create a GLFW window
+    //Create GLFW window and make context current
     GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Lolo Engine 2D", NULL, NULL);
     if (window == nullptr)
     {
         glfwTerminate();
         return -1;
     }
-
     glfwMakeContextCurrent(window);
 
     //Initialize GLAD
@@ -94,10 +99,18 @@ int main(void)
         return -1;
     }
 
+    //Initialize TextRenderer
+    if (InitTextRenderer((float)WINDOW_WIDTH, (float)WINDOW_HEIGHT) == -1)
+    {
+        std::cout << "Failed to initialize TextRenderer" << std::endl;
+        return -1;
+    }
+
     //Initialize Objects Manager
     ObjectsManager::Init();
 
 #pragma region CreateShaderAndObjects
+    //Create base shader for every object
     Shader myShader("Shaders/shader.vs.txt", "Shaders/shader.fs.txt");
     myShader.UseShader();
     float horizontalCoord = (float)WINDOW_WIDTH;
@@ -105,51 +118,39 @@ int main(void)
     glm::mat4 projection = glm::ortho(0.0f, horizontalCoord, verticalCoord, 0.0f, 0.1f, 100.0f);
     myShader.SetMatrix4Uniform("projection", glm::value_ptr(projection));
     myShader.SetIntUniform("texture1", 0);
+    myShader.SetVec3Uniform("color", glm::vec3(1.0f, 1.0f, 1.0f));
     glUseProgram(0);
 
-    LObject* myObject = new LObject(&myShader);
-    myObject->SetObjectLocation(glm::vec2(280.0f, 300.0f));
-    CTextureRenderer* TextureRenderer = new CTextureRenderer("../Content/bee.png");
-    myObject->AttachComponent(TextureRenderer);
-
-    LObject* myObject2 = new LObject(&myShader);
-    myObject2->SetObjectLocation(glm::vec2(180.0f, 300.0f));
-    CTextureRenderer* TextureRenderer2 = new CTextureRenderer("../Content/bee.png");
-    myObject2->AttachComponent(TextureRenderer2);
-
-    LObject* myObject3 = new LObject(&myShader);
-    myObject3->SetObjectLocation(glm::vec2(380.0f, 300.0f));
-    CTextureRenderer* TextureRenderer3 = new CTextureRenderer("../Content/bee.png");
-    myObject3->AttachComponent(TextureRenderer3);
-
-    LObject* myObject4 = new LObject(&myShader);
-    myObject4->SetObjectLocation(glm::vec2(280.0f, 500.0f));
-    CTextureRenderer* TextureRenderer4 = new CTextureRenderer("../Content/bee.png");
-    myObject4->AttachComponent(TextureRenderer4);
-
-    LObject* myObject5 = new LObject(&myShader);
-    myObject5->SetObjectLocation(glm::vec2(180.0f, 500.0f));
-    CTextureRenderer* TextureRenderer5 = new CTextureRenderer("../Content/bee.png");
-    myObject5->AttachComponent(TextureRenderer5);
-
-    LObject* myObject6 = new LObject(&myShader);
-    myObject6->SetObjectLocation(glm::vec2(380.0f, 500.0f));
-    CTextureRenderer* TextureRenderer6 = new CTextureRenderer("../Content/bee.png");
-    myObject6->AttachComponent(TextureRenderer6);
-#pragma endregion CreateShaderAndObjects
-
-    //Initialize TextRenderer
-    if (InitTextRenderer(horizontalCoord, verticalCoord) == -1)
+    //Create every block using two for loops
+    int horizontalOffset = 64;
+    int verticalOffset = 64;
+    unsigned int horizontalBlocks = 8;
+    unsigned int verticalBlocks = 6;
+    for (unsigned int x = 0; x < horizontalBlocks; ++x)
     {
-        std::cout << "Failed to initialize TextRenderer" << std::endl;
-        return -1;
+        for (unsigned int y = 0; y < verticalBlocks; ++y)
+        {
+            //Create block object with its tag
+            Block* block = new Block(&myShader, "Block");
+            //Generate TextureRenderer Cmp with the brick texture and attach it to the object
+            CTextureRenderer* blockTextureCmp = new CTextureRenderer("../Content/brick.png");
+            block->AttachComponent(blockTextureCmp);
+            //Modify location
+            block->SetObjectLocation(glm::vec2(horizontalOffset + x * 64, verticalOffset + y * 32));
+            //Define block´s color using the y value
+            if(y < 2) blockTextureCmp->SetColor(glm::vec3(1.0f, 0.0f, 0.0f)); //Red
+            else if(y < 4) blockTextureCmp->SetColor(glm::vec3(0.0f, 1.0f, 0.0f)); //Green
+            else blockTextureCmp->SetColor(glm::vec3(0.0f, 0.0f, 1.0f)); //Blue
+        }
     }
 
-    //Load some fonts
-    Font basisFont = LoadFont("../Content/Fonts/Dotrice.otf", 45.0f);
-    Font monospacedFont = LoadFont("../Content/Fonts/Monospace.ttf", 55.0f);
+    //Create Paddle object
+    Paddle* paddle = new Paddle(&myShader, "Paddle");
+    CTextureRenderer* paddleTextureCmp = new CTextureRenderer("../Content/paddle.png");
+    paddle->AttachComponent(paddleTextureCmp);
+    paddle->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 64));
 
-    bool destroyObject = false;
+#pragma endregion CreateShaderAndObjects
 
     while (!glfwWindowShouldClose(window))
     {
@@ -162,22 +163,20 @@ int main(void)
         ProcessInput(window);
 
         //Rendering
-        glClearColor(0.2f, 0.8f, 0.4f, 1.0f);
+        glClearColor(0.741f, 0.741f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        //Update every Object in the game
         ObjectsManager::GetInstance()->Update(deltaTime);
 
-        float scaleVal = sinf(glfwGetTime());
-        scaleVal = glm::clamp(scaleVal, 0.1f, 1.0f);
-
-        RenderText(basisFont, "H\nola como\nestas?" + std::to_string(10), glm::vec2(50.0f, 50.0f), scaleVal);
-        RenderText(monospacedFont, "Yo: Estoy bieen ;)", glm::vec2(120.0f, 450.0f), 1.0f, glm::vec3(0.0f, 0.5f, 0.5f));
-        RenderText(basisFont, "Nums = 1234567890!!!", glm::vec2(120.0f, 200.0f), 1.25f, glm::vec3(1.0f, 0.0f, 0.0f));
-        RenderText("Using default Font :o", glm::vec2(250.0f, 145.0f), 1.00f, glm::vec3(1.0f, 1.0f, 0.0f));
-
-        float scale = sinf(glfwGetTime());
-        myObject->SetObjectScale(glm::vec2(scale, scale));
-        myObject5->SetObjectAngle(scale * 20.0f);
+        if(glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        {
+            paddle->AddObjectLocation(glm::vec2(300.0f * deltaTime, 0.0f));
+        }
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        {
+            paddle->AddObjectLocation(glm::vec2(-300.0f * deltaTime, 0.0f));
+        }
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
