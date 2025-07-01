@@ -16,7 +16,7 @@ void CCollider::Update(float deltaTime)
 	const std::vector<CCollider*>& colliders = ColliderManager::GetInstance()->GetColliderCmps();
 	for (std::vector<CCollider*>::const_iterator itr = colliders.begin(); itr != colliders.end(); ++itr)
 	{
-		if ((*itr) != nullptr && (*itr) != this)
+		if ((*itr) != nullptr && (*itr) != this && (*itr)->GetIsEnabled())
 		{
 			bool collide = Collides((*itr));
 			if(collide)
@@ -63,7 +63,7 @@ bool CCollider::CheckCircleRect(const glm::vec2& pos1, float radius1, const glm:
 	const float rectHalfSizeX = size2.x * 0.5f;
 	const float rectHalfSizeY = size2.y * 0.5f;
 
-	if (pos1.x < pos2.x - rectHalfSizeX) recTestX = pos2.x < rectHalfSizeX;
+	if (pos1.x < pos2.x - rectHalfSizeX) recTestX = pos2.x - rectHalfSizeX;
 	else if (pos1.x > pos2.x + rectHalfSizeX) recTestX = pos2.x + rectHalfSizeX;
 
 	if (pos1.y < pos2.y - rectHalfSizeY) recTestY = pos2.y - rectHalfSizeY;

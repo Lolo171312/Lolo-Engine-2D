@@ -7,7 +7,7 @@ CAudioSource::CAudioSource()
 {
     //Disable isActive
     //AudioSource does not need to execute any logic every tick
-    _isActive = false;
+    _isEnabled = false;
 
     //Generate Source
 	alGenSources(1, &_sourceId);

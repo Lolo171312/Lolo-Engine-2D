@@ -42,7 +42,7 @@ void LObject::UpdateComponents(float deltaTime)
 
 	for (std::vector<LComponent*>::const_iterator itr = _components.begin(); itr != _components.end(); ++itr)
 	{
-		if ((*itr)->GetIsActive()) 
+		if ((*itr)->GetIsEnabled()) 
 		{
 			(*itr)->Update(deltaTime);
 		}
@@ -51,6 +51,9 @@ void LObject::UpdateComponents(float deltaTime)
 
 void LObject::Update(float deltaTime)
 {
+	//If the object is not active -> Do nothing
+	if (!_isActive) return;
+
 	//Process Input for the Object
 	Input(deltaTime);
 
@@ -79,4 +82,13 @@ void LObject::SetShaderModelMatrix()
 
 	//Set model matrix in the Shader
 	_objectShader->SetMatrix4Uniform("model", glm::value_ptr(modelMatrix)); 
+}
+
+void LObject::SetIsActive(bool isActive) 
+{
+	_isActive = isActive;
+	for (std::vector<LComponent*>::iterator itr = _components.begin(); itr != _components.end(); ++itr)
+	{
+		(*itr)->SetIsEnabled(isActive);
+	}
 }

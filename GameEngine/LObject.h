@@ -75,6 +75,9 @@ public:
 	inline const Shader* GetShader() const { return _objectShader; }
 	inline const std::string& GetTag() const { return _tag; }
 
+	inline bool GetIsActive() const { return _isActive; }
+	void SetIsActive(bool isActive);
+
 protected:
 	/*
 	* Window variable
@@ -99,6 +102,13 @@ private:
 
 	/*Object tag*/
 	std::string _tag = "None";
+
+	/*
+	* Is Object Active
+	* If true -> Execute Update and Components Update
+	* If false -> Early return in Update
+	*/
+	bool _isActive = true;
 };
 
 template<class T>

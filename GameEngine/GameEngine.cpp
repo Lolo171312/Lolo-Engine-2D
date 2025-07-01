@@ -133,12 +133,12 @@ int main(void)
         {
             //Create block object with its tag
             Block* blockObj = new Block(&myShader, "Block");
-            //Generate TextureRenderer Cmp with the brick texture and attach it to the object
-            CTextureRenderer* blockTextureCmp = new CTextureRenderer("../Content/brick.png");
-            blockObj->AttachComponent(blockTextureCmp);
             //Create ColliderCmp and attach it to the brick
             CColliderRect* blockColliderCmp = new CColliderRect(64.0f, 32.0f);
             blockObj->AttachComponent(blockColliderCmp);
+            //Generate TextureRenderer Cmp with the brick texture and attach it to the object
+            CTextureRenderer* blockTextureCmp = new CTextureRenderer("../Content/brick.png");
+            blockObj->AttachComponent(blockTextureCmp);
             //Modify location
             blockObj->SetObjectLocation(glm::vec2(horizontalOffset + x * 64, verticalOffset + y * 32));
             //Define block´s color using the y value
@@ -150,18 +150,18 @@ int main(void)
 
     //Create Paddle object
     Paddle* paddleObj = new Paddle(&myShader, "Paddle", window);
-    CTextureRenderer* paddleTextureCmp = new CTextureRenderer("../Content/paddle.png");
     CColliderRect* paddleColliderCmp = new CColliderRect(128.0f, 32.0f);
-    paddleObj->AttachComponent(paddleTextureCmp);
     paddleObj->AttachComponent(paddleColliderCmp);
+    CTextureRenderer* paddleTextureCmp = new CTextureRenderer("../Content/paddle.png");
+    paddleObj->AttachComponent(paddleTextureCmp);
     paddleObj->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 64));
 
     //Create Ball object
     Ball* ballObj = new Ball(&myShader, "Ball", window);
-    CTextureRenderer* ballTextureCmp = new CTextureRenderer("../Content/ball.png");
     CColliderCircle* ballColliderCmp = new CColliderCircle(8.0f);
-    ballObj->AttachComponent(ballTextureCmp);
     ballObj->AttachComponent(ballColliderCmp);
+    CTextureRenderer* ballTextureCmp = new CTextureRenderer("../Content/ball.png");
+    ballObj->AttachComponent(ballTextureCmp);
     ballObj->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 90));
 
 #pragma endregion CreateShaderAndObjects

@@ -24,16 +24,16 @@ public:
 	* TRUE: Update function will be called every frame
 	* FALSE: Update function won´t be called at any time
 	*/
-	inline void SetIsActive(bool active) { _isActive = active; }
+	inline void SetIsEnabled(bool enabled) { _isEnabled = enabled; }
 
 	/*
 	* Getter for _isActive variable
 	*/
-	inline bool GetIsActive() const { return _isActive; }
+	inline bool GetIsEnabled() const { return _isEnabled; }
 
-	inline const LObject* GetOwner() const { return _owner; }
+	inline LObject* GetOwner() const { return _owner; }
 
 protected:
 	LObject* _owner;
-	bool _isActive = true;
+	bool _isEnabled = true;
 };

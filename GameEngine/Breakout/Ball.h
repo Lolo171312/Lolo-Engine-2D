@@ -15,6 +15,8 @@ private:
 	bool CheckInitialMovementLimit(int pressingKey) const;
 	void BallCollidesWithBorder();
 
+	void LoseHealth();
+
 	glm::vec2 velocity = glm::vec2(0.0f);
 
 	float _paddleSpeed = 320.0f;
@@ -22,5 +24,7 @@ private:
 	int _windowWidth = 0;
 	int _windowHeight = 0;
 	bool _isPlaying = false;
+
+	int _health = 3;
 };
 
