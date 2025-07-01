@@ -50,7 +50,8 @@ public:
 	virtual void Update(float deltaTime);
 	virtual void Input(float deltaTime);
 
-	virtual void OnCollisionEnter(CCollider* other);
+	virtual void OnCollisionEnter(CCollider* other)
+	{}
 
 	/*
 	* Transform Functions

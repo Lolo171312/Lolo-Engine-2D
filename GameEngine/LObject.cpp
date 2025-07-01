@@ -70,11 +70,6 @@ void LObject::Input(float deltaTime)
 	if (_window == nullptr) return;
 }
 
-void LObject::OnCollisionEnter(CCollider* other)
-{
-
-}
-
 void LObject::SetShaderModelMatrix()
 {
 	glm::mat4 modelMatrix = glm::mat4(1.0f);

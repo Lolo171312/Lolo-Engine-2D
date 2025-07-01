@@ -15,7 +15,7 @@ void Paddle::Input(float deltaTime)
 {
 	LObject::Input(deltaTime);
 
-	if(glfwGetKey(_window, GLFW_KEY_RIGHT)) //Right Arrow key Pressed
+	if(glfwGetKey(_window, GLFW_KEY_RIGHT) == GLFW_PRESS) //Right Arrow key Pressed
 	{
 		AddObjectLocation(glm::vec2(_speed * deltaTime, 0.0f)); //Right Movement
 		//Check Right Margin
@@ -29,7 +29,7 @@ void Paddle::Input(float deltaTime)
 		}
 	}
 
-	if (glfwGetKey(_window, GLFW_KEY_LEFT)) //Left Arrow key Pressed
+	if (glfwGetKey(_window, GLFW_KEY_LEFT) == GLFW_PRESS) //Left Arrow key Pressed
 	{
 		AddObjectLocation(glm::vec2(_speed * deltaTime * -1.0f, 0.0f)); //Left Movement
 		//Check Right Margin
