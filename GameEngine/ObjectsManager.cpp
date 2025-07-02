@@ -71,3 +71,16 @@ void ObjectsManager::DestroyObject(LObject* object)
 		delete object;
 	}
 }
+
+void ObjectsManager::EnableObjects(bool enable) const
+{
+	//Iterate through every object
+	for (std::vector<LObject*>::const_iterator itr = _objects.begin(); itr != _objects.end(); ++itr)
+	{
+		if(*itr != nullptr) //Check if the object is nullptr
+		{
+			//Enable or disable the object
+			(*itr)->SetIsActive(enable);
+		}
+	}
+}

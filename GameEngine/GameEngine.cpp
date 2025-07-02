@@ -28,6 +28,7 @@
 #include "Breakout/Paddle.h"
 #include "Breakout/Ball.h"
 #include "Helpers.h"
+#include "Breakout/GameManager.h"
 
 const int WINDOW_WIDTH = 576;
 const int WINDOW_HEIGHT = 650;
@@ -127,7 +128,7 @@ int main(void)
     int verticalOffset = 64;
     unsigned int horizontalBlocks = 8;
     unsigned int verticalBlocks = 6;
-    for (unsigned int x = 0; x < horizontalBlocks; ++x)
+    for (unsigned int x = 7; x < horizontalBlocks; ++x)
     {
         for (unsigned int y = 0; y < verticalBlocks; ++y)
         {
@@ -166,6 +167,12 @@ int main(void)
 
 #pragma endregion CreateShaderAndObjects
 
+    GameManager::Init();
+    GameManager::GetInstance()->SetPaddlePtr(paddleObj);
+    GameManager::GetInstance()->SetBallPtr(ballObj);
+
+    GameManager::GetInstance()->BeginPlay();
+
     while (!glfwWindowShouldClose(window))
     {
         //Get Delta Time
@@ -182,6 +189,7 @@ int main(void)
 
         //Update every Object in the game
         ObjectsManager::GetInstance()->Update(deltaTime);
+        GameManager::GetInstance()->UpdateManager(deltaTime);
 
         //Check and call events and swap buffers
         glfwSwapBuffers(window);
@@ -194,6 +202,8 @@ int main(void)
     ObjectsManager::GetInstance()->DestroyManager();
     //Terminate Texture Factory
     TextureFactory::GetInstance()->DestroyFactory();
+    //Terminate Breakout GameManager
+    GameManager::GetInstance()->DestroyManager();
     //Terminate Collider Manager
     ColliderManager::Destroy();
     //Terminate GLFW related elements

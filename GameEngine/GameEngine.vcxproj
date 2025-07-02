@@ -132,6 +132,7 @@
   <ItemGroup>
     <ClCompile Include="Breakout\Ball.cpp" />
     <ClCompile Include="Breakout\Block.cpp" />
+    <ClCompile Include="Breakout\GameManager.cpp" />
     <ClCompile Include="Breakout\Paddle.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CAudioSource.cpp" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="Breakout\Ball.h" />
     <ClInclude Include="Breakout\Block.h" />
+    <ClInclude Include="Breakout\GameManager.h" />
     <ClInclude Include="Breakout\Paddle.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CAudioSource.h" />

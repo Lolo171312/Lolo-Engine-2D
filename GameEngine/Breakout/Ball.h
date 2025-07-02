@@ -14,6 +14,8 @@ public:
 private:
 	bool CheckInitialMovementLimit(int pressingKey) const;
 	void BallCollidesWithBorder();
+	void BallCollidesWithPaddle(LObject* paddle);
+	void BallCollidesWithBlock(LObject* block);
 
 	void LoseHealth();
 
@@ -24,7 +26,5 @@ private:
 	int _windowWidth = 0;
 	int _windowHeight = 0;
 	bool _isPlaying = false;
-
-	int _health = 3;
 };
 

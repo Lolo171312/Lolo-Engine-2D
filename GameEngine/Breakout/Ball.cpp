@@ -7,7 +7,9 @@
 #include <cmath>
 #include <iostream>
 #include "../CCollider.h"
-#include "../TextRenderer.h"
+#include "GameManager.h"
+#include "Paddle.h"
+#include "../ObjectsManager.h"
 
 Ball::Ball(Shader* shaderPtr, const std::string& tag, GLFWwindow* window, const Transform& initialTransform) : 
 	LObject(shaderPtr, tag, window, initialTransform)
@@ -21,9 +23,6 @@ Ball::Ball(Shader* shaderPtr, const std::string& tag, GLFWwindow* window, const 
 void Ball::Update(float deltaTime)
 {
 	LObject::Update(deltaTime);
-
-	//Render Health Text
-	RenderText("Health:" + std::to_string(_health), glm::vec2(400.0f, 640.0f));
 
 	if (!_isPlaying) return;
 
@@ -82,24 +81,11 @@ void Ball::OnCollisionEnter(CCollider* other)
 	{
 		if(otherObj->GetTag() == "Paddle") //Check if other is the Paddle
 		{
-			//Set the velocity to the impact direction between the Ball and Paddle
-			glm::vec2 impactDir = glm::normalize(GetObjectLocation() - otherObj->GetObjectLocation());
-			velocity = impactDir;
+			BallCollidesWithPaddle(otherObj);
 			return;
 		}
 
-		//Get the impact point between Ball and Block
-		float width = 32.0f, height = 16.0f;
-		glm::vec2 closestPoint;
-		closestPoint.x = std::max(otherObj->GetObjectLocation().x - width, std::min(GetObjectLocation().x, otherObj->GetObjectLocation().x + width));
-		closestPoint.y = std::max(otherObj->GetObjectLocation().y - height, std::min(GetObjectLocation().y, otherObj->GetObjectLocation().y + height));
-
-		//Get the normal of the impact and calculate the reflect vector
-		glm::vec2 impactNormal = glm::normalize(GetObjectLocation() - closestPoint);
-		//Set the velocity to that reflected vector
-		velocity = glm::normalize(glm::reflect(velocity, impactNormal));
-		//Disable the object
-		otherObj->SetIsActive(false);
+		BallCollidesWithBlock(otherObj);
 	}
 }
 
@@ -163,15 +149,45 @@ void Ball::BallCollidesWithBorder()
 	}
 }
 
+void Ball::BallCollidesWithPaddle(LObject* paddle)
+{
+	//Set the velocity to the impact direction between the Ball and Paddle
+	glm::vec2 impactDir = glm::normalize(GetObjectLocation() - paddle->GetObjectLocation());
+	velocity = impactDir;
+}
+
+void Ball::BallCollidesWithBlock(LObject* block)
+{
+	//Get the impact point between Ball and Block
+	float width = 32.0f, height = 16.0f;
+	glm::vec2 closestPoint;
+	closestPoint.x = std::max(block->GetObjectLocation().x - width, std::min(GetObjectLocation().x, block->GetObjectLocation().x + width));
+	closestPoint.y = std::max(block->GetObjectLocation().y - height, std::min(GetObjectLocation().y, block->GetObjectLocation().y + height));
+
+	//Get the normal of the impact and calculate the reflect vector
+	glm::vec2 impactNormal = glm::normalize(GetObjectLocation() - closestPoint);
+	//Set the velocity to that reflected vector
+	velocity = glm::normalize(glm::reflect(velocity, impactNormal));
+	//Disable the object
+	block->SetIsActive(false);
+	GameManager::GetInstance()->SetPoints(50);
+
+	const std::vector<LObject*>& worldObjs = ObjectsManager::GetInstance()->GetObjects();
+	for (std::vector<LObject*>::const_iterator itr = worldObjs.begin(); itr != worldObjs.end(); ++itr)
+	{
+		if(*itr != nullptr && (*itr)->GetIsActive() && (*itr)->GetTag() == "Block")
+		{
+			return;
+		}
+	}
+
+	_isPlaying = false;
+	GameManager::GetInstance()->SetGameState(WINGAME);
+}
+
 void Ball::LoseHealth()
 {
-	_health = glm::clamp(_health - 1, 0, 3); //Substract -1 health
-	if(_health > 0) //Restart the ball
-	{
-		_isPlaying = false;
-	}
-	else //Game Over
-	{
+	_isPlaying = false;
 
-	}
+	GameManager::GetInstance()->SetGameState(LOSEHEALTH);
 }

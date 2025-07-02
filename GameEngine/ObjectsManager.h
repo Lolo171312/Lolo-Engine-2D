@@ -22,6 +22,11 @@ public:
 	void AddObject(LObject* newObject);
 	void DestroyObject(LObject* object);
 
+	//Enable or Disable every object in the World
+	void EnableObjects(bool enable) const;
+
+	const std::vector<LObject*>& GetObjects() const { return _objects; }
+
 private:
 	//Holds every Object added to the manager
 	std::vector<LObject*> _objects;
