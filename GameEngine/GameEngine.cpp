@@ -34,7 +34,7 @@ const int WINDOW_WIDTH = 576;
 const int WINDOW_HEIGHT = 650;
 
 float deltaTime = 0.0f;
-float prevTime = 0.0f;
+float prevTime = glfwGetTime();
 
 //Called every time the viewport´s size is set
 void FrameBuffer_Size_Callback(GLFWwindow* window, int width, int height) 
@@ -93,7 +93,6 @@ int main(void)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-
     //Initialize TextRenderer
     if (InitSound() == -1)
     {
@@ -128,7 +127,7 @@ int main(void)
     int verticalOffset = 64;
     unsigned int horizontalBlocks = 8;
     unsigned int verticalBlocks = 6;
-    for (unsigned int x = 7; x < horizontalBlocks; ++x)
+    for (unsigned int x = 0; x < horizontalBlocks; ++x)
     {
         for (unsigned int y = 0; y < verticalBlocks; ++y)
         {
@@ -140,6 +139,9 @@ int main(void)
             //Generate TextureRenderer Cmp with the brick texture and attach it to the object
             CTextureRenderer* blockTextureCmp = new CTextureRenderer("../Content/brick.png");
             blockObj->AttachComponent(blockTextureCmp);
+            //Generate AudioSource Cmp and attach it to the object
+            CAudioSource* blockAudioSourceCmp = new CAudioSource();
+            blockObj->AttachComponent(blockAudioSourceCmp);
             //Modify location
             blockObj->SetObjectLocation(glm::vec2(horizontalOffset + x * 64, verticalOffset + y * 32));
             //Define block´s color using the y value
@@ -163,6 +165,8 @@ int main(void)
     ballObj->AttachComponent(ballColliderCmp);
     CTextureRenderer* ballTextureCmp = new CTextureRenderer("../Content/ball.png");
     ballObj->AttachComponent(ballTextureCmp);
+    CAudioSource* ballAudioSource = new CAudioSource();
+    ballObj->AttachComponent(ballAudioSource);
     ballObj->SetObjectLocation(glm::vec2((float)WINDOW_WIDTH / 2.0f, (float)WINDOW_HEIGHT - 90));
 
 #pragma endregion CreateShaderAndObjects
@@ -173,6 +177,13 @@ int main(void)
 
     GameManager::GetInstance()->BeginPlay();
 
+    GameManager::GetInstance()->SetBackgroundColor(0.741f, 0.741f, 1.0f);
+
+    ObjectsManager::GetInstance()->BeginPlay();
+
+    int frameCount = 0;
+    int fps = 0;
+
     while (!glfwWindowShouldClose(window))
     {
         //Get Delta Time
@@ -180,12 +191,28 @@ int main(void)
         deltaTime = currentTime - prevTime;
         prevTime = currentTime;
 
+        // FPS Counter
+        frameCount++;
+        static float fpsTime = 0.0f;
+        fpsTime += deltaTime;
+
+        if (fpsTime >= 1.0f) {
+            std::cout << "FPS: " << frameCount << std::endl;
+            fps = frameCount;
+            frameCount = 0;
+            fpsTime = 0.0f;
+        }
+        
+
         //Input
         ProcessInput(window);
 
         //Rendering
-        glClearColor(0.741f, 0.741f, 1.0f, 1.0f);
+        const glm::vec3& backColor = GameManager::GetInstance()->GetBackgroundColor();
+        glClearColor(backColor.x, backColor.y, backColor.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        RenderText("FPS: " + std::to_string(fps), glm::vec2(25.0f, 25.0f));
 
         //Update every Object in the game
         ObjectsManager::GetInstance()->Update(deltaTime);

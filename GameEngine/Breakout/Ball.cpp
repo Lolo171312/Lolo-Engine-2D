@@ -10,6 +10,8 @@
 #include "GameManager.h"
 #include "Paddle.h"
 #include "../ObjectsManager.h"
+#include "../Sound.h"
+#include "../CAudioSource.h"
 
 Ball::Ball(Shader* shaderPtr, const std::string& tag, GLFWwindow* window, const Transform& initialTransform) : 
 	LObject(shaderPtr, tag, window, initialTransform)
@@ -18,6 +20,14 @@ Ball::Ball(Shader* shaderPtr, const std::string& tag, GLFWwindow* window, const 
 	{
 		glfwGetWindowSize(window, &_windowWidth, &_windowHeight);
 	}
+}
+
+void Ball::BeginPlay()
+{
+	_audioSourceCmp = GetComponent<CAudioSource>();
+	_paddleBounceClip = LoadSoundClip("../Content/Sounds/PaddleImpact.wav");
+	_launchBallClip = LoadSoundClip("../Content/Sounds/LaunchBall.wav");
+	_bounceBorderClip = LoadSoundClip("../Content/Sounds/WindowBounce.wav");
 }
 
 void Ball::Update(float deltaTime)
@@ -41,6 +51,11 @@ void Ball::Input(float deltaTime)
 	{
 		_isPlaying = true;
 		velocity = glm::normalize(glm::vec2(0.0f, -1.0f));
+		if(_audioSourceCmp)
+		{
+			_audioSourceCmp->SetAudioClip(_launchBallClip);
+			_audioSourceCmp->Play();
+		}
 	} 
 
 	//Move the ball alongside the Paddle
@@ -87,6 +102,11 @@ void Ball::OnCollisionEnter(CCollider* other)
 
 		BallCollidesWithBlock(otherObj);
 	}
+}
+
+void Ball::SetSpeed(float newSpeed)
+{
+	_speed = glm::clamp(newSpeed, _minSpeed, _maxSpeed);
 }
 
 bool Ball::CheckInitialMovementLimit(int pressingKey) const
@@ -146,6 +166,12 @@ void Ball::BallCollidesWithBorder()
 		impactNormal = glm::normalize(impactNormal);
 		//Set ball´s velocity
 		velocity = glm::normalize(glm::reflect(velocity, impactNormal));
+
+		if(_audioSourceCmp)
+		{
+			_audioSourceCmp->SetAudioClip(_bounceBorderClip);
+			_audioSourceCmp->Play();
+		}
 	}
 }
 
@@ -154,6 +180,12 @@ void Ball::BallCollidesWithPaddle(LObject* paddle)
 	//Set the velocity to the impact direction between the Ball and Paddle
 	glm::vec2 impactDir = glm::normalize(GetObjectLocation() - paddle->GetObjectLocation());
 	velocity = impactDir;
+
+	if(_audioSourceCmp!=nullptr)
+	{
+		_audioSourceCmp->SetAudioClip(_paddleBounceClip);
+		_audioSourceCmp->Play();
+	}
 }
 
 void Ball::BallCollidesWithBlock(LObject* block)
@@ -171,6 +203,7 @@ void Ball::BallCollidesWithBlock(LObject* block)
 	//Disable the object
 	block->SetIsActive(false);
 	GameManager::GetInstance()->SetPoints(50);
+	SetSpeed(_speed + 10);
 
 	const std::vector<LObject*>& worldObjs = ObjectsManager::GetInstance()->GetObjects();
 	for (std::vector<LObject*>::const_iterator itr = worldObjs.begin(); itr != worldObjs.end(); ++itr)

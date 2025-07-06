@@ -13,6 +13,17 @@ ObjectsManager::~ObjectsManager()
 	_objects.clear();
 }
 
+void ObjectsManager::BeginPlay()
+{
+	for (std::vector<LObject*>::iterator itr = _objects.begin(); itr != _objects.end(); ++itr)
+	{
+		if(*itr != nullptr)
+		{
+			(*itr)->BeginPlay();
+		}
+	}
+}
+
 void ObjectsManager::Update(float deltaTime)
 {
 	//Iterates through every object and executes its Update in case the object is NOT nullptr

@@ -11,6 +11,9 @@ Paddle::Paddle(Shader* shaderPtr, const std::string& tag, GLFWwindow* window, co
 	}
 }
 
+void Paddle::BeginPlay()
+{}
+
 void Paddle::Input(float deltaTime)
 {
 	LObject::Input(deltaTime);

@@ -13,6 +13,8 @@ public:
 	//Destroy every object
 	~ObjectsManager();
 
+	//Execute BeginPlay of every object
+	void BeginPlay();
 	//Execute Update of every object
 	void Update(float deltaTime);
 	//Destroy the Manager so it can destroy every object

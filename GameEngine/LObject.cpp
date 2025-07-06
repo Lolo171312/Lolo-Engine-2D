@@ -87,6 +87,12 @@ void LObject::SetShaderModelMatrix()
 void LObject::SetIsActive(bool isActive) 
 {
 	_isActive = isActive;
+
+	if (isActive)
+		OnEnable();
+	else
+		OnDisable();
+
 	for (std::vector<LComponent*>::iterator itr = _components.begin(); itr != _components.end(); ++itr)
 	{
 		(*itr)->SetIsEnabled(isActive);

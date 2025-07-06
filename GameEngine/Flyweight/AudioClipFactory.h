@@ -16,6 +16,8 @@ public:
 private:
 	virtual AudioClipType* InsertNewType(const char* key);
 
+	int16_t FloatToPCM16(float f);
+
 	AudioClipType* LoadClip(const char* audioFileDir);
 };
 

@@ -47,6 +47,7 @@ public:
 	template<class T>
 	T* GetComponent();
 
+	virtual void BeginPlay() = 0;
 	virtual void Update(float deltaTime);
 	virtual void Input(float deltaTime);
 
@@ -77,6 +78,8 @@ public:
 
 	inline bool GetIsActive() const { return _isActive; }
 	void SetIsActive(bool isActive);
+	virtual void OnEnable() = 0;
+	virtual void OnDisable() = 0;
 
 protected:
 	/*
